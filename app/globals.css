@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-ink: #090807;
+  --color-panel: #100e0c;
+  --color-card: #141210;
+  --color-line: #3a3228;
+  --color-gold: #c6a36a;
+  --color-gold-2: #e6d3ae;
+  --color-cream: #f4efe6;
+  --color-mute: #a3988c;
+  --color-blush: #e4b2a8;
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+
+::selection {
+  background: #c6a36a;
+  color: #1a140c;
+}
+
+:focus-visible {
+  outline: 1px solid #c6a36a;
+  outline-offset: 3px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.aura-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #c6a36a transparent;
+}
+
+.aura-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.aura-scroll::-webkit-scrollbar-thumb {
+  background: #c6a36a;
 }
