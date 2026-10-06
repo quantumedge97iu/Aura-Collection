@@ -53,3 +53,7 @@ body {
 .aura-scroll::-webkit-scrollbar-thumb {
   background: #c6a36a;
 }
+
+.hero-photo {
+  object-fit: cover;
+}

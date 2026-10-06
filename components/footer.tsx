@@ -51,8 +51,8 @@ export function Footer() {
       </Container>
 
       <div className="border-t border-white/5">
-        <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="sm:col-span-2 lg:col-span-1">
+        <Container className="grid gap-10 py-12 sm:grid-cols-2 xl:grid-cols-[minmax(240px,1.15fr)_repeat(4,minmax(0,1fr))]">
+          <div className="sm:col-span-2 xl:col-span-1">
             <Logo />
             <div className="mt-5 flex gap-3">
               {socials.map((item) => (
@@ -81,8 +81,8 @@ export function Footer() {
           <div>
             <h2 className="text-[11px] tracking-[0.22em] text-cream uppercase">Get in Touch</h2>
             <ul className="mt-4 space-y-3 text-sm text-mute">
-              <li className="flex items-center gap-2"><Icon name="mail" className="h-4 w-4 text-gold" /> support@luxejewels.pk</li>
-              <li className="flex items-center gap-2"><Icon name="phone" className="h-4 w-4 text-gold" /> +92 300 1234567</li>
+              <li className="flex items-start gap-2"><Icon name="mail" className="mt-0.5 h-4 w-4 shrink-0 text-gold" /> <span className="min-w-0 break-all">support@luxejewels.pk</span></li>
+              <li className="flex items-start gap-2"><Icon name="phone" className="mt-0.5 h-4 w-4 shrink-0 text-gold" /> <span className="min-w-0">+92 300 1234567</span></li>
               <li className="flex items-center gap-2"><Icon name="pin" className="h-4 w-4 text-gold" /> Karachi, Pakistan</li>
             </ul>
           </div>

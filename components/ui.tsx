@@ -20,8 +20,8 @@ export function Logo() {
         <circle cx="24" cy="24" r="1.7" fill="currentColor" stroke="none" />
       </svg>
       <span className="leading-none">
-        <span className="block font-serif text-[15px] tracking-[0.18em] text-cream sm:text-[20px] sm:tracking-[0.22em]">LUXE JEWELS</span>
-        <span className="mt-1 block text-[8px] tracking-[0.28em] text-gold sm:text-[9px] sm:tracking-[0.32em]">TIMELESS ELEGANCE</span>
+        <span className="block truncate font-serif text-[13px] tracking-[0.14em] text-cream min-[380px]:text-[15px] min-[380px]:tracking-[0.16em] sm:text-[20px] sm:tracking-[0.22em]">LUXE JEWELS</span>
+        <span className="mt-1 hidden truncate text-[8px] tracking-[0.22em] text-gold min-[400px]:block sm:text-[9px] sm:tracking-[0.32em]">TIMELESS ELEGANCE</span>
       </span>
     </Link>
   );
@@ -42,7 +42,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 px-5 py-3 text-[11px] font-medium tracking-[0.18em] uppercase transition disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2 rounded-[4px] px-5 py-3 text-[11px] font-medium tracking-[0.18em] uppercase transition disabled:cursor-not-allowed disabled:opacity-50",
         buttonVariants[variant],
         className,
       )}
@@ -68,7 +68,7 @@ export function ButtonLink({
     <Link
       href={href}
       className={cn(
-        "inline-flex items-center justify-center gap-2 px-5 py-3 text-[11px] font-medium tracking-[0.18em] uppercase transition",
+        "inline-flex items-center justify-center gap-2 rounded-[4px] px-5 py-3 text-[11px] font-medium tracking-[0.18em] uppercase transition",
         buttonVariants[variant],
         className,
       )}

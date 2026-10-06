@@ -26,7 +26,7 @@ export function Newsletter() {
             onChange={(event) => setEmail(event.target.value)}
             placeholder="Enter your email address"
             aria-label="Email address"
-            className="h-11 flex-1 border border-gold/40 bg-transparent px-4 text-sm outline-none placeholder:text-mute focus:border-gold"
+            className="h-11 min-w-0 flex-1 border border-gold/40 bg-transparent px-4 text-sm outline-none placeholder:text-mute focus:border-gold"
           />
           <Button type="submit" className="h-11">Subscribe</Button>
         </>

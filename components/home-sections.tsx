@@ -15,7 +15,7 @@ export function CategoryStrip() {
               <div className="relative aspect-square overflow-hidden">
                 <Image src={category.image} alt="" fill sizes="120px" className="object-cover transition duration-500 group-hover:scale-105" />
               </div>
-              <span className="block py-2.5 text-center text-[9px] tracking-[0.16em] text-cream uppercase sm:text-[10px]">{category.label}</span>
+              <span className="block px-1 py-2 text-center text-[9px] leading-tight tracking-[0.08em] text-cream uppercase sm:py-2.5 sm:text-[10px] sm:tracking-[0.14em]">{category.label}</span>
             </Link>
           ))}
         </div>
@@ -42,7 +42,7 @@ export function ProductRail({
       <Container>
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
-            <h2 className="font-serif text-2xl tracking-[0.16em] text-cream uppercase sm:text-3xl">{title}</h2>
+            <h2 className="font-serif text-2xl tracking-[0.08em] text-cream uppercase sm:text-3xl sm:tracking-[0.16em]">{title}</h2>
             <p className="mt-1 font-serif text-base text-gold italic sm:text-lg">{subtitle}</p>
           </div>
           <Link href={href} className="shrink-0 text-[11px] tracking-[0.16em] text-gold uppercase">View all →</Link>
@@ -55,8 +55,8 @@ export function ProductRail({
             <Image src={feature.image} alt={feature.alt} fill sizes="(min-width:1280px) 20vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/15" />
             <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-              <p className="text-[10px] tracking-[0.28em] text-gold uppercase">{feature.eyebrow}</p>
-              <h3 className="mt-2 font-serif text-4xl leading-none text-cream">{feature.title}</h3>
+              <p className="text-[10px] tracking-[0.14em] text-gold uppercase sm:tracking-[0.28em]">{feature.eyebrow}</p>
+              <h3 className="mt-2 font-serif text-3xl leading-none text-cream sm:text-4xl">{feature.title}</h3>
               {feature.text ? <p className="mt-3 max-w-[16rem] text-sm leading-6 text-cream/80">{feature.text}</p> : null}
               <span className="mt-5 inline-flex border border-gold/70 px-4 py-2.5 text-[11px] tracking-[0.16em] text-gold uppercase">{feature.cta} →</span>
             </div>
@@ -83,7 +83,7 @@ export function TrustBar() {
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-gold/50 text-gold">
               <Icon name={item.icon} className="h-5 w-5" />
             </span>
-            <span>
+            <span className="min-w-0">
               <span className="block text-sm text-cream">{item.title}</span>
               <span className="mt-0.5 block text-xs text-mute">{item.text}</span>
             </span>
