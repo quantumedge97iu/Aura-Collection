@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant, Outfit } from "next/font/google";
+import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { Aura } from "@/components/aura";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
@@ -11,7 +11,7 @@ const outfit = Outfit({
   variable: "--font-outfit",
 });
 
-const cormorant = Cormorant({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],

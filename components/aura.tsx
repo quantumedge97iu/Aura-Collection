@@ -19,7 +19,7 @@ const welcome: ChatMessage = {
 };
 
 function AuraMark({ className }: { className?: string }) {
-  return <Image src="/media/aura-robot.png" alt="" width={128} height={128} className={cn("object-contain", className)} />;
+  return <img src="/media/aura-robot.png" alt="" className={cn("object-contain", className)} />;
 }
 
 export function Aura() {
