@@ -99,7 +99,7 @@ export function Aura() {
         <section
           role="dialog"
           aria-label="Aura, jewelry concierge"
-          className="flex h-[min(72vh,600px)] w-[min(calc(100vw-1.5rem),390px)] flex-col overflow-hidden border border-gold/40 bg-panel shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+          className="flex h-[min(72vh,600px)] w-[min(calc(100vw-1.5rem),390px)] flex-col overflow-hidden rounded-2xl border border-gold/40 bg-panel shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
         >
           <header className="flex items-center gap-3 border-b border-gold/20 px-4 py-3">
             <AuraMark className="h-11 w-11 shrink-0" />
@@ -198,12 +198,13 @@ export function Aura() {
           </form>
         </section>
       ) : (
-        <button type="button" onClick={() => setOpen(true)} className="flex items-center gap-2 border border-gold/40 bg-panel py-1.5 pr-4 pl-1.5 shadow-[0_16px_50px_rgba(0,0,0,0.45)]">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Ask Aura"
+          className="grid h-16 w-16 place-items-center overflow-hidden rounded-full border border-gold/40 bg-panel shadow-[0_16px_50px_rgba(0,0,0,0.45)]"
+        >
           <AuraMark className="h-14 w-14" />
-          <span className="text-left">
-            <span className="block text-[10px] tracking-[0.22em] text-gold uppercase">Ask Aura</span>
-            <span className="block text-xs text-mute">Your jewelry concierge</span>
-          </span>
         </button>
       )}
     </div>

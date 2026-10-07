@@ -23,7 +23,7 @@ export default function HelpPage() {
         </div>
         <section id="contact">
           <h2 className="font-serif text-3xl text-cream">Contact the studio</h2>
-          <p className="mt-2 text-sm text-mute">support@luxejewels.pk · +92 300 1234567 · Karachi</p>
+          <p className="mt-2 text-sm text-mute">fatahfizza07@gmail.com · 03200005764 · Karachi</p>
           <div className="mt-5">
             <ContactForm />
           </div>
