@@ -81,8 +81,14 @@ export function Footer() {
           <div>
             <h2 className="text-[11px] tracking-[0.22em] text-cream uppercase">Get in Touch</h2>
             <ul className="mt-4 space-y-3 text-sm text-mute">
-              <li className="flex items-center gap-2"><Icon name="mail" className="h-4 w-4 text-gold" /> support@luxejewels.pk</li>
-              <li className="flex items-center gap-2"><Icon name="phone" className="h-4 w-4 text-gold" /> +92 300 1234567</li>
+              <li className="flex items-center gap-2">
+                <Icon name="mail" className="h-4 w-4 shrink-0 text-gold" />
+                <a href="mailto:fatahfizza07@gmail.com" className="hover:text-gold">fatahfizza07@gmail.com</a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Icon name="phone" className="h-4 w-4 shrink-0 text-gold" />
+                <a href="tel:+923200005764" className="hover:text-gold">03200005764</a>
+              </li>
               <li className="flex items-center gap-2"><Icon name="pin" className="h-4 w-4 text-gold" /> Karachi, Pakistan</li>
             </ul>
           </div>

@@ -72,8 +72,11 @@ export function Header() {
             </label>
             <Link href="/track" className="hover:text-gold">Track Order</Link>
             <Link href="/help" className="hover:text-gold">Help</Link>
-            <a href="tel:+923001234567" className="hidden items-center gap-1.5 text-gold xl:inline-flex">
-              <Icon name="phone" className="h-3.5 w-3.5" /> +92 300 1234567
+            <a href="mailto:fatahfizza07@gmail.com" className="hidden items-center gap-1.5 text-gold 2xl:inline-flex">
+              <Icon name="mail" className="h-3.5 w-3.5" /> fatahfizza07@gmail.com
+            </a>
+            <a href="tel:+923200005764" className="hidden items-center gap-1.5 text-gold xl:inline-flex">
+              <Icon name="phone" className="h-3.5 w-3.5" /> 03200005764
             </a>
           </div>
         </Container>
@@ -215,7 +218,8 @@ export function Header() {
               <Link href="/account" className="hover:text-gold">Account</Link>
               <Link href="/track" className="hover:text-gold">Track Order</Link>
               <Link href="/help" className="hover:text-gold">Help</Link>
-              <a href="tel:+923001234567" className="text-gold">+92 300 1234567</a>
+              <a href="mailto:fatahfizza07@gmail.com" className="text-gold">fatahfizza07@gmail.com</a>
+              <a href="tel:+923200005764" className="text-gold">03200005764</a>
             </div>
           </nav>
         </div>
