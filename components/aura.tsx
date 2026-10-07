@@ -18,6 +18,10 @@ const welcome: ChatMessage = {
   text: "I am Aura, the house concierge. Tell me who it is for, the piece, or a budget, and I will pull from the collection.",
 };
 
+function AuraMark({ className }: { className?: string }) {
+  return <img src="/media/aura-robot.png" alt="" className={cn("object-contain", className)} />;
+}
+
 export function Aura() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -98,7 +102,7 @@ export function Aura() {
           className="flex h-[min(72vh,600px)] w-[min(calc(100vw-1.5rem),390px)] flex-col overflow-hidden border border-gold/40 bg-panel shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
         >
           <header className="flex items-center gap-3 border-b border-gold/20 px-4 py-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-gold/50 font-serif text-lg text-gold">A</span>
+            <AuraMark className="h-11 w-11 shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="text-[11px] tracking-[0.22em] text-gold uppercase">Ask Aura</p>
               <p className="truncate text-xs text-mute">Jewelry concierge · in the house</p>
@@ -115,7 +119,7 @@ export function Aura() {
             {messages.map((message) => (
               <article key={message.id} className={cn("flex gap-2", message.role === "you" && "justify-end")}>
                 {message.role === "aura" ? (
-                  <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gold/40 font-serif text-sm text-gold">A</span>
+                  <AuraMark className="mt-0.5 h-8 w-8 shrink-0" />
                 ) : null}
                 <div className={cn("max-w-[85%]", message.role === "you" && "max-w-[78%]")}>
                   <p className={cn("px-3 py-2.5 text-sm leading-6", message.role === "you" ? "bg-gold text-ink" : "border border-gold/25 bg-ink/50 text-cream")}>
@@ -151,7 +155,7 @@ export function Aura() {
             ))}
             {thinking ? (
               <div className="flex gap-2">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gold/40 font-serif text-sm text-gold">A</span>
+                <AuraMark className="h-8 w-8 shrink-0" />
                 <p className="border border-gold/25 bg-ink/50 px-3 py-3 text-gold" aria-label="Aura is looking">
                   <span className="inline-flex gap-1">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gold" />
@@ -194,13 +198,11 @@ export function Aura() {
           </form>
         </section>
       ) : (
-        <button type="button" onClick={() => setOpen(true)} className="flex items-center gap-3 border border-gold/40 bg-panel py-2 pr-2 pl-4 shadow-[0_16px_50px_rgba(0,0,0,0.45)]">
+        <button type="button" onClick={() => setOpen(true)} className="flex items-center gap-2 border border-gold/40 bg-panel py-1.5 pr-4 pl-1.5 shadow-[0_16px_50px_rgba(0,0,0,0.45)]">
+          <AuraMark className="h-14 w-14" />
           <span className="text-left">
             <span className="block text-[10px] tracking-[0.22em] text-gold uppercase">Ask Aura</span>
             <span className="block text-xs text-mute">Your jewelry concierge</span>
-          </span>
-          <span className="grid h-11 w-11 place-items-center rounded-full bg-gold text-ink">
-            <Icon name="chat" className="h-5 w-5" />
           </span>
         </button>
       )}

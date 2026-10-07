@@ -51,8 +51,8 @@ export function Footer() {
       </Container>
 
       <div className="border-t border-white/5">
-        <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="sm:col-span-2 lg:col-span-1">
+        <Container className="grid gap-10 py-12 sm:grid-cols-2 xl:grid-cols-[minmax(240px,1.15fr)_repeat(4,minmax(0,1fr))]">
+          <div className="sm:col-span-2 xl:col-span-1">
             <Logo />
             <div className="mt-5 flex gap-3">
               {socials.map((item) => (
@@ -83,7 +83,7 @@ export function Footer() {
             <ul className="mt-4 space-y-3 text-sm text-mute">
               <li className="flex items-center gap-2">
                 <Icon name="mail" className="h-4 w-4 shrink-0 text-gold" />
-                <a href="mailto:fatahfizza07@gmail.com" className="hover:text-gold">fatahfizza07@gmail.com</a>
+                <a href="mailto:fatahfizza07@gmail.com" className="min-w-0 break-all hover:text-gold">fatahfizza07@gmail.com</a>
               </li>
               <li className="flex items-center gap-2">
                 <Icon name="phone" className="h-4 w-4 shrink-0 text-gold" />
