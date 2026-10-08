@@ -107,9 +107,11 @@ export function getRuntime() {
     const cache = samePool && current ? current.cache : config.redisUrl ? RedisKv.connect(config.redisUrl) : new MemoryKv();
     const pool = samePool && current ? current.pool : createPool(config.databaseUrl);
     if (!samePool && !config.redisUrl) console.warn(JSON.stringify({ msg: "REDIS_URL is unset. Catalog cache and rate limits stay in this process." }));
-    globalStore.luxeRuntime = createRuntime(config, pool, cache);
+    const runtime = createRuntime(config, pool, cache);
+    globalStore.luxeRuntime = runtime;
+    return runtime;
   }
-  return globalStore.luxeRuntime;
+  return current;
 }
 
 export async function dispatch(request: Request, runtime: Runtime = getRuntime()) {
