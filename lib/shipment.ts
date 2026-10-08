@@ -85,7 +85,7 @@ export function shipmentOf(order: ShipmentOrder, now = new Date()): Shipment {
       key: "shipped",
       label: "Shipped",
       place: "Left Karachi",
-      detail: "Handed to Luxe Dispatch.",
+      detail: "Handed to Aura Dispatch.",
       at: shipped.toISOString(),
     },
     {
@@ -111,7 +111,7 @@ export function shipmentOf(order: ShipmentOrder, now = new Date()): Shipment {
 
   return {
     tracking: trackingCode(order.id),
-    courier: "Luxe Dispatch",
+    courier: "Aura Dispatch",
     city,
     eta: delivered.toISOString(),
     current,

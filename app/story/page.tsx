@@ -4,7 +4,7 @@ import { ButtonLink, Container } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Our Story",
-  description: "The house behind Luxe Jewels.",
+  description: "The house behind Aura Loom Diamond.",
 };
 
 export default function StoryPage() {
@@ -18,7 +18,7 @@ export default function StoryPage() {
           <p className="text-[11px] tracking-[0.32em] text-gold uppercase">The House</p>
           <h1 className="mt-3 font-serif text-5xl text-cream sm:text-6xl">The art of jewelry</h1>
           <div className="mt-5 space-y-4 text-sm leading-7 text-cream/80">
-            <p>Luxe Jewels is a Karachi house making gold and diamond pieces for people who wear them, not store them. Every piece is hallmarked. Delivery is insured, and cash on delivery is available in every city we ship to.</p>
+            <p>Aura Loom Diamond is a Karachi house making gold and diamond pieces for people who wear them, not store them. Every piece is hallmarked. Delivery is insured, and cash on delivery is available in every city we ship to.</p>
             <p>The collection stays small on purpose. New arrivals come in when a setting is right. Bridal sets are finished for the week of the wedding, then meant to be worn again.</p>
             <p>More than an accessory, a piece is a record of who it was bought for.</p>
           </div>

@@ -71,7 +71,7 @@ export function ShipmentTrack({ order }: { order: Order }) {
           );
         })}
       </ol>
-      <p className="mt-6 text-xs leading-5 text-mute">Luxe Dispatch moves this timeline from the order time and the delivery city. A live courier feed is not connected yet.</p>
+      <p className="mt-6 text-xs leading-5 text-mute">Aura Dispatch moves this timeline from the order time and the delivery city. A live courier feed is not connected yet.</p>
     </section>
   );
 }

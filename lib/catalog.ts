@@ -325,7 +325,7 @@ export function getListing(slug?: string): Listing | null {
     return {
       eyebrow: "Just In",
       title: "New Arrivals",
-      subtitle: "Fresh designs. Timeless beauty.",
+      subtitle: "Fresh designs. Timeless elegance.",
       products: products.filter((product) => product.tags.includes("new")),
     };
   }

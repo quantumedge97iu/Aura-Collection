@@ -7,21 +7,31 @@ export function Container({ className, children }: { className?: string; childre
   return <div className={cn("mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8", className)}>{children}</div>;
 }
 
-export function Logo() {
+export function Logo({ stacked = false }: { stacked?: boolean } = {}) {
   return (
-    <Link href="/" className="flex min-w-0 items-center gap-2.5">
-      <svg viewBox="0 0 48 48" className="h-9 w-9 shrink-0 text-gold" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden>
-        <path d="M24 6c2.2 4.2 2.2 8.2 0 12.2-2.2-4-2.2-8 0-12.2Z" />
-        <path d="M24 42c-2.2-4.2-2.2-8.2 0-12.2 2.2 4 2.2 8 0 12.2Z" />
-        <path d="M6 24c4.2-2.2 8.2-2.2 12.2 0-4 2.2-8 2.2-12.2 0Z" />
-        <path d="M42 24c-4.2 2.2-8.2 2.2-12.2 0 4-2.2 8-2.2 12.2 0Z" />
-        <path d="M11 11c3.4 2.6 6.2 6.4 7.2 10.2-3.6-1.2-7.4-4-10.2-7.2 1-1 2-2 3-3Z" />
-        <path d="M37 11c-1 1-2 2-3 3-2.8 3.2-6.6 6-10.2 7.2 1-3.8 3.8-7.6 7.2-10.2 1 1 2 2 3 3Z" />
-        <circle cx="24" cy="24" r="1.7" fill="currentColor" stroke="none" />
-      </svg>
-      <span className="leading-none">
-        <span className="block truncate font-serif text-[13px] tracking-[0.14em] text-cream min-[380px]:text-[15px] min-[380px]:tracking-[0.16em] sm:text-[20px] sm:tracking-[0.22em]">LUXE JEWELS</span>
-        <span className="mt-1 hidden truncate text-[8px] tracking-[0.22em] text-gold min-[400px]:block sm:text-[9px] sm:tracking-[0.32em]">TIMELESS ELEGANCE</span>
+    <Link href="/" className="flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5" aria-label="Aura Loom Diamond">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/aura-loom-mark.svg" alt="" width={36} height={36} className="h-8 w-8 shrink-0 sm:h-9 sm:w-9" />
+      <span className="min-w-0 leading-none">
+        <span
+          className={cn(
+            "block font-serif text-cream",
+            stacked
+              ? "text-[13px] tracking-[0.12em] sm:text-[14px] sm:tracking-[0.14em]"
+              : "text-[10px] tracking-[0.08em] min-[360px]:text-[11px] min-[360px]:tracking-[0.1em] sm:text-[14px] sm:tracking-[0.14em] md:text-[15px] md:tracking-[0.16em] lg:text-[17px] lg:tracking-[0.18em]",
+          )}
+        >
+          <span className={cn("block whitespace-nowrap", !stacked && "sm:inline")}>AURA LOOM</span>
+          <span className={cn("block whitespace-nowrap", !stacked && "sm:ml-1.5 sm:inline")}>DIAMOND</span>
+        </span>
+        <span
+          className={cn(
+            "mt-1 tracking-[0.2em] text-gold sm:tracking-[0.28em] md:tracking-[0.32em]",
+            stacked ? "block text-[8px] sm:text-[9px]" : "hidden text-[7px] min-[420px]:block sm:text-[8px] md:text-[9px]",
+          )}
+        >
+          TIMELESS ELEGANCE
+        </span>
       </span>
     </Link>
   );

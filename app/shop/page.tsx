@@ -4,7 +4,7 @@ import { getListing } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Shop",
-  description: "Shop gold and diamond jewelry from Luxe Jewels.",
+  description: "Shop gold and diamond jewelry from Aura Loom Diamond.",
 };
 
 export default function ShopPage() {

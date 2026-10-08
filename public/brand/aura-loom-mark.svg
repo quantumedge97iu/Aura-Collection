@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="ald-gold" x1="8" y1="6" x2="40" y2="42" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E6D3AE"/>
+      <stop offset="0.45" stop-color="#C6A36A"/>
+      <stop offset="1" stop-color="#A8884E"/>
+    </linearGradient>
+  </defs>
+  <!-- Faceted diamond -->
+  <path d="M24 5.5 L41.5 24 L24 42.5 L6.5 24 Z" stroke="url(#ald-gold)" stroke-width="1.35" stroke-linejoin="round"/>
+  <path d="M24 12.5 L34.5 24 L24 35.5 L13.5 24 Z" stroke="url(#ald-gold)" stroke-width="1.1" stroke-linejoin="round" opacity="0.95"/>
+  <!-- Loom threads through the stone -->
+  <path d="M11 24 H37" stroke="url(#ald-gold)" stroke-width="1" opacity="0.85"/>
+  <path d="M24 11 V37" stroke="url(#ald-gold)" stroke-width="1" opacity="0.85"/>
+  <path d="M14.2 14.2 L33.8 33.8" stroke="url(#ald-gold)" stroke-width="0.9" opacity="0.55"/>
+  <path d="M33.8 14.2 L14.2 33.8" stroke="url(#ald-gold)" stroke-width="0.9" opacity="0.55"/>
+  <!-- Center brilliance -->
+  <circle cx="24" cy="24" r="2.1" fill="url(#ald-gold)"/>
+</svg>

@@ -12,7 +12,7 @@ export function ContactForm() {
   }
 
   if (sent) {
-    return <p className="border border-gold/40 p-5 text-sm text-gold-2">Message noted on this device. Write to support@luxejewels.pk and the studio will reply once the inbox is connected.</p>;
+    return <p className="border border-gold/40 p-5 text-sm text-gold-2">Message noted on this device. Write to fatahfizza07@gmail.com and the studio will reply once the inbox is connected.</p>;
   }
 
   return (

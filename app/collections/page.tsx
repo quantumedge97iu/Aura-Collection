@@ -6,7 +6,7 @@ import { collections } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Collections",
-  description: "Edited jewelry collections from Luxe Jewels.",
+  description: "Edited jewelry collections from Aura Loom Diamond.",
 };
 
 export default function CollectionsPage() {

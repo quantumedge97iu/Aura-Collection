@@ -3,14 +3,14 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/icons";
-import { ButtonLink, Container } from "@/components/ui";
+import { ButtonLink } from "@/components/ui";
 import { cn } from "@/lib/format";
 
 const slides = [
   {
     label: "Collection",
     title: ["Jewelry,", "refined."],
-    text: "Hallmarked gold and diamonds, finished in Karachi and delivered across Pakistan.",
+    text: "Aura Loom Diamond — hallmarked gold and diamonds, finished in Karachi and delivered across Pakistan.",
     cta: "Shop the collection",
     href: "/shop",
     image: "/media/hero-portrait.jpg",
@@ -30,7 +30,7 @@ const slides = [
   {
     label: "The house",
     title: ["Elegant", "by nature."],
-    text: "More than an accessory. A reflection of the person who wears it.",
+    text: "Aura Loom Diamond. More than an accessory — a reflection of the person who wears it.",
     cta: "Read our story",
     href: "/story",
     image: "/media/promo-hands.jpg",

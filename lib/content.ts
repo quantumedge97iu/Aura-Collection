@@ -89,7 +89,7 @@ export const policies: Record<string, Policy> = {
       },
       {
         heading: "What ships with the piece",
-        list: ["Hallmark or assay card", "Luxe Jewels box", "Care card and invoice", "A tamper seal"],
+        list: ["Hallmark or assay card", "Aura Loom Diamond box", "Care card and invoice", "A tamper seal"],
       },
     ],
   },
@@ -99,7 +99,7 @@ export const policies: Record<string, Policy> = {
     blocks: [
       {
         paragraphs: [
-          "You have 7 days from delivery to return or exchange an unworn piece. Write to support@luxejewels.pk or start from your order number and we will arrange pickup.",
+          "You have 7 days from delivery to return or exchange an unworn piece. Write to fatahfizza07@gmail.com or start from your order number and we will arrange pickup.",
         ],
       },
       {
@@ -131,7 +131,7 @@ export const policies: Record<string, Policy> = {
       {
         paragraphs: [
           "This storefront keeps your bag, wishlist, and orders in local storage on your device. Nothing is sent to a server yet.",
-          "When the backend is connected, we will store only what an order needs: name, phone, address, and payment reference. Card numbers will be handled by the payment provider, not by Luxe Jewels.",
+          "When the backend is connected, we will store only what an order needs: name, phone, address, and payment reference. Card numbers will be handled by the payment provider, not by Aura Loom Diamond.",
         ],
       },
     ],

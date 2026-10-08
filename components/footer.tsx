@@ -51,9 +51,9 @@ export function Footer() {
       </Container>
 
       <div className="border-t border-white/5">
-        <Container className="grid gap-10 py-12 sm:grid-cols-2 xl:grid-cols-[minmax(240px,1.15fr)_repeat(4,minmax(0,1fr))]">
-          <div className="sm:col-span-2 xl:col-span-1">
-            <Logo />
+        <Container className="grid gap-10 py-12 sm:grid-cols-2 xl:grid-cols-[minmax(220px,0.95fr)_repeat(4,minmax(0,1fr))] xl:gap-x-12">
+          <div className="min-w-0 sm:col-span-2 xl:col-span-1">
+            <Logo stacked />
             <div className="mt-5 flex gap-3">
               {socials.map((item) => (
                 <a key={item.name} href={item.href} target="_blank" rel="noreferrer" aria-label={item.label} className="grid h-9 w-9 place-items-center rounded-full border border-gold/30 text-gold hover:bg-gold hover:text-ink">
@@ -94,7 +94,7 @@ export function Footer() {
           </div>
         </Container>
       </div>
-      <Container className="border-t border-white/5 py-5 text-xs text-mute">© {new Date().getFullYear()} Luxe Jewels. All rights reserved.</Container>
+      <Container className="border-t border-white/5 py-5 text-xs text-mute">© {new Date().getFullYear()} Aura Loom Diamond. All rights reserved.</Container>
     </footer>
   );
 }

@@ -13,7 +13,7 @@ export default function HomePage() {
       <CategoryStrip />
       <ProductRail
         title="New Arrivals"
-        subtitle="Fresh designs. Timeless beauty."
+        subtitle="Fresh designs. Timeless elegance."
         href="/shop/new-arrivals"
         products={arrivals}
         feature={{

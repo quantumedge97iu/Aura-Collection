@@ -5,7 +5,7 @@ import { faqs } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Help",
-  description: "Delivery, returns, payments, and how to reach Luxe Jewels.",
+  description: "Delivery, returns, payments, and how to reach Aura Loom Diamond.",
 };
 
 export default function HelpPage() {

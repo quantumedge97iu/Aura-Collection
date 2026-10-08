@@ -119,8 +119,8 @@ export function CheckoutView() {
             {payment === "bank" ? (
               <div className="mt-4 border border-gold/30 bg-ink p-4 text-sm leading-6 text-mute">
                 <p className="text-cream">Bank Alfalah · Demo account</p>
-                <p>Title: Luxe Jewels</p>
-                <p>IBAN: PK00 LUXE 0000 0000 1234 5678</p>
+                <p>Title: Aura Loom Diamond</p>
+                <p>IBAN: PK00 AURA 0000 0000 1234 5678</p>
                 <p className="mt-2">Use your order number as the transfer reference. No money moves on this preview.</p>
               </div>
             ) : null}

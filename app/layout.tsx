@@ -19,11 +19,31 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
+  applicationName: "Aura Loom Diamond",
   title: {
-    default: "Luxe Jewels · Timeless Elegance",
-    template: "%s · Luxe Jewels",
+    default: "Aura Loom Diamond · Timeless Elegance",
+    template: "%s · Aura Loom Diamond",
   },
-  description: "Premium gold and diamond jewelry. Free insured delivery across Pakistan, with cash on delivery.",
+  description:
+    "Aura Loom Diamond — premium gold and diamond jewelry. Free insured delivery across Pakistan, with cash on delivery.",
+  keywords: ["Aura Loom Diamond", "gold jewelry", "diamond jewelry", "Pakistan", "Karachi", "bridal jewelry"],
+  authors: [{ name: "Aura Loom Diamond" }],
+  creator: "Aura Loom Diamond",
+  publisher: "Aura Loom Diamond",
+  openGraph: {
+    type: "website",
+    locale: "en_PK",
+    siteName: "Aura Loom Diamond",
+    title: "Aura Loom Diamond · Timeless Elegance",
+    description:
+      "Aura Loom Diamond — premium gold and diamond jewelry. Free insured delivery across Pakistan, with cash on delivery.",
+  },
+  twitter: {
+    card: "summary",
+    title: "Aura Loom Diamond · Timeless Elegance",
+    description:
+      "Aura Loom Diamond — premium gold and diamond jewelry. Free insured delivery across Pakistan, with cash on delivery.",
+  },
 };
 
 export const viewport: Viewport = {
