@@ -58,7 +58,8 @@ export function Header({ categories, collections, chrome }: { categories: Catego
   const helpHref = chrome?.helpHref || "/help";
   const pathname = usePathname();
   const router = useRouter();
-  const { ready, cartCount, wishlist, city, setDeliverTo, cities } = useStore();
+  const { ready, session, cartCount, wishlist, city, setDeliverTo, cities } = useStore();
+  const accountName = session?.name.trim() || session?.email || "";
   const [menu, setMenu] = useState(false);
   const [open, setOpen] = useState<"shop" | "collections" | null>(null);
   const [query, setQuery] = useState("");
@@ -149,7 +150,14 @@ export function Header({ categories, collections, chrome }: { categories: Catego
           ))}
         </div>
         <div className="mt-8 flex flex-col gap-4 text-[13px] tracking-[0.04em] text-mute">
-          <Link href="/account" className="hover:text-gold">Account</Link>
+          <Link href="/account" onClick={() => setMenu(false)} className="hover:text-gold">
+            {accountName ? (
+              <span className="flex flex-col gap-0.5">
+                <span className="text-cream">{accountName}</span>
+                {session?.email ? <span className="text-[11px] text-gold">{session.email}</span> : null}
+              </span>
+            ) : "Account"}
+          </Link>
           <Link href={trackHref} className="hover:text-gold">{chrome?.trackLabel || "Track Order"}</Link>
           <Link href={helpHref} className="hover:text-gold">{chrome?.helpLabel || "Help"}</Link>
           <a href={phoneHref} className="text-gold">{phone}</a>
@@ -302,8 +310,9 @@ export function Header({ categories, collections, chrome }: { categories: Catego
           <button type="button" className="grid h-10 w-10 shrink-0 place-items-center text-gold xl:hidden" aria-label="Search" onClick={() => setMobileSearch(true)}>
             <Icon name="search" className="h-5 w-5" />
           </button>
-          <Link href="/account" aria-label="Account" className="hidden h-10 w-10 place-items-center text-cream hover:text-gold sm:grid">
-            <Icon name="user" className="h-5 w-5" />
+          <Link href="/account" aria-label={accountName ? `${accountName} account` : "Account"} title={session?.email || "Account"} className="hidden h-10 max-w-[11rem] items-center gap-2 text-cream hover:text-gold sm:flex">
+            <Icon name="user" className="h-5 w-5 shrink-0" />
+            {ready && accountName ? <span className="min-w-0 truncate text-[12px] tracking-[0.02em] text-gold-2">{accountName}</span> : null}
           </Link>
           <Link href="/wishlist" aria-label="Wishlist" className="relative grid h-10 w-10 place-items-center text-cream hover:text-gold">
             <Icon name="heart" className="h-5 w-5" />

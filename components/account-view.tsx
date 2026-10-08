@@ -83,7 +83,7 @@ export function AccountView() {
     const phoneValue = phone ?? session.phone ?? "";
     return (
       <Container className="py-10 sm:py-14">
-        <PageHeader eyebrow="Account" title={`Hello, ${session.name.split(" ")[0]}`} subtitle={session.email} />
+        <PageHeader eyebrow="Signed in" title={session.name.trim() || "Your account"} subtitle={session.email} />
         <Button variant="line" className="mt-6" onClick={signOut}>Sign out</Button>
 
         <section className="mt-10 max-w-lg">

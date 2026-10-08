@@ -54,6 +54,27 @@ body {
   background: var(--color-gold);
 }
 
+.aura-live-pulse {
+  animation: aura-live-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes aura-live-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(198, 163, 106, 0.28);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(230, 211, 174, 0.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-live-pulse {
+    animation: none;
+    box-shadow: none;
+  }
+}
+
 .hero-photo {
   object-fit: cover;
 }
