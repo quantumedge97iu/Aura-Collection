@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/icons";
 import { concierge } from "@/lib/assist";
+import type { Product } from "@/lib/catalog";
+import { fetchProducts } from "@/lib/shop";
 import { cn, pkr } from "@/lib/format";
 
 type ChatProduct = { slug: string; name: string; price: number; image: string };
@@ -28,9 +30,15 @@ export function Aura() {
   const [text, setText] = useState("");
   const [thinking, setThinking] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([welcome]);
+  const [catalog, setCatalog] = useState<Product[]>([]);
   const thread = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLInputElement>(null);
   const replyTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!open || catalog.length > 0) return;
+    fetchProducts({ limit: 48 }).then((page) => setCatalog(page.products)).catch(() => setCatalog([]));
+  }, [open, catalog.length]);
 
   useEffect(() => {
     const show = () => setOpen(true);
@@ -67,7 +75,7 @@ export function Aura() {
     setText("");
     setThinking(true);
     replyTimer.current = window.setTimeout(() => {
-      const answer = concierge(query);
+      const answer = concierge(query, catalog);
       setMessages((current) => [
         ...current,
         {

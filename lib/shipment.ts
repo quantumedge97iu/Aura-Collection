@@ -1,5 +1,3 @@
-import { getProduct } from "@/lib/catalog";
-
 const transitDays: Record<string, number> = {
   Karachi: 1,
   Hyderabad: 2,
@@ -31,89 +29,63 @@ export type Shipment = {
 };
 
 type ShipmentOrder = {
-  id: string;
+  number: string;
   createdAt: string;
+  status: string;
   shipping: { city: string };
-  items: Array<{ slug: string }>;
+  tracking?: string;
+  eta?: string | null;
+  shipmentStatus?: string | null;
+  history?: Array<{ status: string; at: string }>;
 };
 
 export function trackingCode(orderId: string) {
   return `LX-${orderId.replace(/^LJ-?/i, "")}`;
 }
 
-export function arrivalDate(city: string, from = new Date(), madeToOrder = false) {
-  return atHour(addWorkingDays(from, leadDays(city, madeToOrder)), 18);
+export function arrivalDate(city: string, from = new Date(), madeToOrder = false, transitDays?: number) {
+  const days = (transitDays ?? leadDays(city, false)) + (madeToOrder ? 5 : 0);
+  return atHour(addWorkingDays(from, days), 18);
 }
 
-export function shipmentOf(order: ShipmentOrder, now = new Date()): Shipment {
+const statusIndex: Record<string, number> = {
+  created: 0,
+  confirmed: 1,
+  processing: 2,
+  shipped: 3,
+  delivered: 5,
+  returned: 5,
+  refunded: 5,
+  cancelled: 0,
+};
+
+export function shipmentOf(order: ShipmentOrder): Shipment {
   const city = order.shipping.city || "Karachi";
   const placed = new Date(order.createdAt);
-  const workshop = order.items.some((item) => getProduct(item.slug)?.category === "bridal");
-  const confirmed = new Date(placed.getTime() + 2 * 60 * 60 * 1000);
-  const packed = workshop ? atHour(addWorkingDays(placed, 5), 11) : new Date(placed.getTime() + 8 * 60 * 60 * 1000);
-  const deliveredAt = arrivalDate(city, placed, workshop);
-  let shipped = atHour(previousWorkingDay(deliveredAt), 16);
-  if (shipped.getTime() <= packed.getTime()) shipped = new Date(packed.getTime() + 4 * 60 * 60 * 1000);
-  let out = atHour(deliveredAt, 9);
-  if (out.getTime() <= shipped.getTime()) out = new Date(shipped.getTime() + 4 * 60 * 60 * 1000);
-  let delivered = new Date(deliveredAt.getTime());
-  if (delivered.getTime() <= out.getTime()) delivered = new Date(out.getTime() + 6 * 60 * 60 * 1000);
+  const eta = order.eta ? new Date(order.eta) : arrivalDate(city, placed, false);
+  const atFor = (status: string) => order.history?.find((entry) => entry.status === status)?.at;
+  let current = statusIndex[order.status] ?? 0;
+  if (order.shipmentStatus === "packed") current = 2;
+  if (order.shipmentStatus === "shipped") current = 3;
+  if (order.shipmentStatus === "out_for_delivery") current = 4;
+  if (order.shipmentStatus === "delivered" || order.status === "delivered") current = 5;
+  if (order.status === "cancelled") current = 0;
 
+  const stamp = (index: number, status: string) => (index <= current ? atFor(status) ?? placed.toISOString() : eta.toISOString());
   const steps: ShipmentStep[] = [
-    {
-      key: "placed",
-      label: "Order placed",
-      place: "Karachi studio",
-      detail: "The order is in the house book.",
-      at: placed.toISOString(),
-    },
-    {
-      key: "confirmed",
-      label: "Confirmed",
-      place: "Karachi studio",
-      detail: "The house accepted it and reserved the piece.",
-      at: confirmed.toISOString(),
-    },
-    {
-      key: "packed",
-      label: "Packed",
-      place: workshop ? "Workshop" : "Karachi studio",
-      detail: workshop ? "The bridal piece is finished, hallmarked, and boxed." : "Hallmarked, boxed, and sealed for dispatch.",
-      at: packed.toISOString(),
-    },
-    {
-      key: "shipped",
-      label: "Shipped",
-      place: "Left Karachi",
-      detail: "Handed to Aura Dispatch.",
-      at: shipped.toISOString(),
-    },
-    {
-      key: "out",
-      label: "Out for delivery",
-      place: city,
-      detail: `The courier is in ${city} with the parcel.`,
-      at: out.toISOString(),
-    },
-    {
-      key: "delivered",
-      label: "Delivered",
-      place: city,
-      detail: "Signed for at the delivery address.",
-      at: delivered.toISOString(),
-    },
+    { key: "placed", label: "Order placed", place: "Karachi studio", detail: order.status === "cancelled" ? "This order was cancelled." : "The order is in the house book.", at: stamp(0, "created") },
+    { key: "confirmed", label: "Confirmed", place: "Karachi studio", detail: "The house accepted the order.", at: stamp(1, "confirmed") },
+    { key: "packed", label: "Packed", place: "Karachi studio", detail: "Hallmarked, boxed, and sealed for dispatch.", at: stamp(2, "processing") },
+    { key: "shipped", label: "Shipped", place: "Left Karachi", detail: "Handed to Aura Dispatch.", at: stamp(3, "shipped") },
+    { key: "out", label: "Out for delivery", place: city, detail: `The courier is in ${city} with the parcel.`, at: stamp(4, "shipped") },
+    { key: "delivered", label: "Delivered", place: city, detail: "Signed for at the delivery address.", at: stamp(5, "delivered") },
   ];
 
-  let current = 0;
-  steps.forEach((step, index) => {
-    if (new Date(step.at).getTime() <= now.getTime()) current = index;
-  });
-
   return {
-    tracking: trackingCode(order.id),
+    tracking: order.tracking || trackingCode(order.number),
     courier: "Aura Dispatch",
     city,
-    eta: delivered.toISOString(),
+    eta: eta.toISOString(),
     current,
     steps,
   };
@@ -147,14 +119,6 @@ function addWorkingDays(from: Date, days: number) {
     next.setDate(next.getDate() + 1);
     if (next.getDay() !== 0) left -= 1;
   }
-  return next;
-}
-
-function previousWorkingDay(from: Date) {
-  const next = new Date(from.getTime());
-  do {
-    next.setDate(next.getDate() - 1);
-  } while (next.getDay() === 0);
   return next;
 }
 

@@ -6,7 +6,7 @@ import { Icon } from "@/components/icons";
 import { ButtonLink } from "@/components/ui";
 import { cn } from "@/lib/format";
 
-const slides = [
+const defaultSlides = [
   {
     label: "Collection",
     title: ["Jewelry,", "refined."],
@@ -39,22 +39,25 @@ const slides = [
   },
 ];
 
-const assurances = ["Hallmarked gold", "Free delivery", "Cash on delivery"];
+const defaultAssurances = ["Hallmarked gold", "Free delivery", "Cash on delivery"];
 
-export function Hero() {
+export type HeroSlide = (typeof defaultSlides)[number];
+
+export function Hero({ slides = defaultSlides, assurances = defaultAssurances }: { slides?: HeroSlide[]; assurances?: string[] }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const slide = slides[index];
+  const safeSlides = slides.length > 0 ? slides : defaultSlides;
+  const slide = safeSlides[index] ?? safeSlides[0];
 
   useEffect(() => {
     if (paused) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = window.setInterval(() => setIndex((current) => (current + 1) % slides.length), 7000);
+    const id = window.setInterval(() => setIndex((current) => (current + 1) % safeSlides.length), 7000);
     return () => window.clearInterval(id);
-  }, [index, paused]);
+  }, [index, paused, safeSlides.length]);
 
   function go(next: number) {
-    setIndex((next + slides.length) % slides.length);
+    setIndex((next + safeSlides.length) % safeSlides.length);
   }
 
   return (
@@ -71,7 +74,7 @@ export function Hero() {
     >
       <div className="flex flex-col lg:grid lg:min-h-[min(780px,calc(100svh-7.5rem))] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div className="relative order-2 h-[58svh] min-h-[360px] lg:h-auto lg:min-h-full">
-          {slides.map((item, itemIndex) => (
+          {safeSlides.map((item, itemIndex) => (
             <div
               key={item.href}
               className={cn(
@@ -94,7 +97,7 @@ export function Hero() {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-ink to-transparent lg:hidden" />
           <div className="absolute bottom-4 left-4 z-10 flex items-center gap-3 lg:bottom-6 lg:left-6">
             <p className="text-[11px] tracking-[0.22em] text-cream uppercase" aria-live="polite">
-              0{index + 1} <span className="text-gold/70">/</span> 0{slides.length}
+              0{index + 1} <span className="text-gold/70">/</span> 0{safeSlides.length}
             </p>
             <button
               type="button"
@@ -130,7 +133,7 @@ export function Hero() {
               </ButtonLink>
             </div>
             <ul className="mt-5 flex flex-col gap-2 text-[11px] tracking-[0.12em] text-mute uppercase sm:mt-8 sm:flex-row sm:flex-wrap sm:gap-x-5 sm:tracking-[0.14em]">
-              {assurances.map((item) => (
+              {(assurances.length > 0 ? assurances : defaultAssurances).map((item) => (
                 <li key={item} className="inline-flex items-center gap-2">
                   <Icon name="check" className="h-3.5 w-3.5 text-gold" />
                   {item}
@@ -138,7 +141,7 @@ export function Hero() {
               ))}
             </ul>
             <div className="mt-6 grid grid-cols-3 border-t border-line sm:mt-10" role="tablist" aria-label="Hero slides">
-              {slides.map((item, itemIndex) => {
+              {safeSlides.map((item, itemIndex) => {
                 const active = itemIndex === index;
                 return (
                   <button

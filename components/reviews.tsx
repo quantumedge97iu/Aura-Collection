@@ -3,10 +3,20 @@
 import { useState } from "react";
 import { Icon } from "@/components/icons";
 import { Container, Stars } from "@/components/ui";
-import { reviews } from "@/lib/content";
+import type { HouseReview } from "@/lib/shop";
 
-export function Reviews() {
+export function Reviews({ reviews }: { reviews: HouseReview[] }) {
   const [index, setIndex] = useState(0);
+  if (reviews.length === 0) {
+    return (
+      <section className="py-14 sm:py-16">
+        <Container>
+          <h2 className="font-serif text-2xl tracking-[0.14em] text-cream uppercase sm:text-3xl">What our customers say</h2>
+          <p className="mt-4 text-sm text-mute">Published reviews will appear here.</p>
+        </Container>
+      </section>
+    );
+  }
   const visible = [0, 1, 2].map((offset) => reviews[(index + offset) % reviews.length]);
 
   return (
@@ -25,18 +35,18 @@ export function Reviews() {
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {visible.map((review, offset) => (
-            <figure key={review.name} className={`border border-gold/25 bg-card p-5 ${offset > 0 ? "hidden md:block" : ""}`}>
+            <figure key={review.id} className={`border border-gold/25 bg-card p-5 ${offset > 0 ? "hidden md:block" : ""}`}>
               <div className="flex items-center gap-3">
                 <span className="grid h-12 w-12 place-items-center rounded-full border border-gold/40 font-serif text-lg text-gold">
                   {review.name.split(" ").map((part) => part[0]).join("")}
                 </span>
                 <figcaption>
                   <span className="block text-sm text-cream">{review.name}</span>
-                  <span className="block text-xs text-mute">{review.city}</span>
+                  {review.productName ? <span className="block text-xs text-mute">{review.productName}</span> : null}
                 </figcaption>
               </div>
               <Stars value={review.rating} />
-              <blockquote className="mt-3 text-sm leading-6 text-cream/85">“{review.quote}”</blockquote>
+              <blockquote className="mt-3 text-sm leading-6 text-cream/85">“{review.body}”</blockquote>
             </figure>
           ))}
         </div>

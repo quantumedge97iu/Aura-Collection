@@ -5,42 +5,88 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Icon } from "@/components/icons";
-import { useClientReady, useStore } from "@/components/store";
+import { useStore } from "@/components/store";
 import { Container, Logo } from "@/components/ui";
-import { categories, collections, searchProducts } from "@/lib/catalog";
-import { cities } from "@/lib/content";
+import type { Category, Collection } from "@/lib/catalog";
 import { cn } from "@/lib/format";
+import { fetchSearch } from "@/lib/shop";
 
-const links = [
-  { href: "/shop", label: "Shop", menu: "shop" as const },
-  { href: "/collections", label: "Collections", menu: "collections" as const },
+type MenuLink = { href: string; label: string; menu?: "shop" | "collections" };
+
+const defaultLinks: MenuLink[] = [
+  { href: "/shop", label: "Shop", menu: "shop" },
+  { href: "/collections", label: "Collections", menu: "collections" },
   { href: "/shop/new-arrivals", label: "New Arrivals" },
   { href: "/shop/bridal", label: "Bridal" },
   { href: "/shop/men", label: "Men" },
   { href: "/shop/gifts", label: "Gifts" },
 ];
 
-export function Header() {
+export type HeaderChrome = {
+  deliveryLabel?: string;
+  deliveryDetail?: string;
+  paymentLabel?: string;
+  paymentShort?: string;
+  secureLabel?: string;
+  phone?: string;
+  phoneHref?: string;
+  email?: string;
+  emailHref?: string;
+  trackLabel?: string;
+  trackHref?: string;
+  helpLabel?: string;
+  helpHref?: string;
+  links?: Array<{ label: string; href: string }>;
+};
+
+function menuLinks(links?: Array<{ label: string; href: string }>): MenuLink[] {
+  if (!links?.length) return defaultLinks;
+  return links.map((link) => ({
+    href: link.href,
+    label: link.label,
+    menu: link.href === "/shop" ? "shop" : link.href === "/collections" ? "collections" : undefined,
+  }));
+}
+
+export function Header({ categories, collections, chrome }: { categories: Category[]; collections: Collection[]; chrome?: HeaderChrome | null }) {
+  const links = menuLinks(chrome?.links);
+  const phone = chrome?.phone || "03200005764";
+  const phoneHref = chrome?.phoneHref || "tel:+923200005764";
+  const email = chrome?.email || "fatahfizza07@gmail.com";
+  const emailHref = chrome?.emailHref || "mailto:fatahfizza07@gmail.com";
+  const trackHref = chrome?.trackHref || "/track";
+  const helpHref = chrome?.helpHref || "/help";
   const pathname = usePathname();
   const router = useRouter();
-  const { cartCount, wishlist, city, setDeliverTo } = useStore();
-  const ready = useClientReady();
+  const { ready, cartCount, wishlist, city, setDeliverTo, cities } = useStore();
   const [menu, setMenu] = useState(false);
   const [open, setOpen] = useState<"shop" | "collections" | null>(null);
   const [query, setQuery] = useState("");
   const [mobileSearch, setMobileSearch] = useState(false);
   const [suggesting, setSuggesting] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [activePath, setActivePath] = useState(pathname);
-  const suggestions = query.trim().length > 1 ? searchProducts(query).slice(0, 5) : [];
+  const [suggestions, setSuggestions] = useState<Array<{ slug: string; name: string }>>([]);
+  const [searching, setSearching] = useState(false);
 
-  if (activePath !== pathname) {
-    setActivePath(pathname);
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setSearching(true);
+      fetchSearch(q).then((items) => setSuggestions(items.slice(0, 5).map((item) => ({ slug: item.slug, name: item.name })))).catch(() => setSuggestions([])).finally(() => setSearching(false));
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [query]);
+
+  useEffect(() => {
     setMenu(false);
     setOpen(null);
     setMobileSearch(false);
     setSuggesting(false);
-  }
+  }, [pathname]);
 
   useEffect(() => {
     setMounted(true);
@@ -104,9 +150,9 @@ export function Header() {
         </div>
         <div className="mt-8 flex flex-col gap-4 text-[13px] tracking-[0.04em] text-mute">
           <Link href="/account" className="hover:text-gold">Account</Link>
-          <Link href="/track" className="hover:text-gold">Track Order</Link>
-          <Link href="/help" className="hover:text-gold">Help</Link>
-          <a href="tel:+923001234567" className="text-gold">+92 300 1234567</a>
+          <Link href={trackHref} className="hover:text-gold">{chrome?.trackLabel || "Track Order"}</Link>
+          <Link href={helpHref} className="hover:text-gold">{chrome?.helpLabel || "Help"}</Link>
+          <a href={phoneHref} className="text-gold">{phone}</a>
         </div>
       </nav>
     </div>
@@ -117,25 +163,25 @@ export function Header() {
       <div className="hidden border-b border-white/5 text-[11px] text-mute sm:block">
         <Container className="flex h-9 items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3 lg:gap-6">
-            <span className="inline-flex min-w-0 items-center gap-1.5"><Icon name="truck" className="h-3.5 w-3.5 shrink-0 text-gold" /> <span className="truncate">Free delivery<span className="hidden lg:inline"> across Pakistan</span></span></span>
-            <span className="hidden items-center gap-1.5 md:inline-flex"><Icon name="card" className="h-3.5 w-3.5 text-gold" /> <span className="hidden lg:inline">Cash on delivery</span><span className="lg:hidden">COD</span></span>
-            <span className="hidden items-center gap-1.5 xl:inline-flex"><Icon name="shield" className="h-3.5 w-3.5 text-gold" /> Secure payments</span>
+            <span className="inline-flex min-w-0 items-center gap-1.5"><Icon name="truck" className="h-3.5 w-3.5 shrink-0 text-gold" /> <span className="truncate">{chrome?.deliveryLabel || "Free delivery"}<span className="hidden lg:inline"> {chrome?.deliveryDetail || "across Pakistan"}</span></span></span>
+            <span className="hidden items-center gap-1.5 md:inline-flex"><Icon name="card" className="h-3.5 w-3.5 text-gold" /> <span className="hidden lg:inline">{chrome?.paymentLabel || "Cash on delivery"}</span><span className="lg:hidden">{chrome?.paymentShort || "COD"}</span></span>
+            <span className="hidden items-center gap-1.5 xl:inline-flex"><Icon name="shield" className="h-3.5 w-3.5 text-gold" /> {chrome?.secureLabel || "Secure payments"}</span>
           </div>
           <div className="flex shrink-0 items-center gap-3 lg:gap-4">
             <label className="inline-flex items-center gap-2">
               <Icon name="pin" className="h-3.5 w-3.5 text-gold" />
               <span className="hidden lg:inline">Deliver to</span>
               <select aria-label="Delivery city" value={city} onChange={(event) => setDeliverTo(event.target.value)} className="max-w-[7.5rem] truncate bg-transparent text-cream outline-none">
-                {cities.map((item) => <option key={item} className="bg-ink text-cream">{item}</option>)}
+                {cities.map((item) => <option key={item.city} className="bg-ink text-cream">{item.city}</option>)}
               </select>
             </label>
-            <Link href="/track" className="hover:text-gold">Track Order</Link>
-            <Link href="/help" className="hover:text-gold">Help</Link>
-            <a href="mailto:fatahfizza07@gmail.com" className="hidden items-center gap-1.5 text-gold 2xl:inline-flex">
-              <Icon name="mail" className="h-3.5 w-3.5" /> fatahfizza07@gmail.com
+            <Link href={trackHref} className="hover:text-gold">{chrome?.trackLabel || "Track Order"}</Link>
+            <Link href={helpHref} className="hover:text-gold">{chrome?.helpLabel || "Help"}</Link>
+            <a href={emailHref} className="hidden items-center gap-1.5 text-gold 2xl:inline-flex">
+              <Icon name="mail" className="h-3.5 w-3.5" /> {email}
             </a>
-            <a href="tel:+923200005764" className="hidden items-center gap-1.5 text-gold xl:inline-flex">
-              <Icon name="phone" className="h-3.5 w-3.5" /> 03200005764
+            <a href={phoneHref} className="hidden items-center gap-1.5 text-gold xl:inline-flex">
+              <Icon name="phone" className="h-3.5 w-3.5" /> {phone}
             </a>
           </div>
         </Container>
@@ -147,7 +193,7 @@ export function Header() {
             <Icon name="pin" className="h-3.5 w-3.5 text-gold" />
             <span>Deliver to</span>
             <select aria-label="Delivery city" value={city} onChange={(event) => setDeliverTo(event.target.value)} className="bg-transparent text-cream outline-none">
-              {cities.map((item) => <option key={item} className="bg-ink text-cream">{item}</option>)}
+              {cities.map((item) => <option key={item.city} className="bg-ink text-cream">{item.city}</option>)}
             </select>
           </label>
           <Link href="/track" className="text-gold">Track</Link>
@@ -172,6 +218,7 @@ export function Header() {
               />
             </div>
           </form>
+          {searching ? <p className="border-t border-white/5 px-5 py-3 text-sm text-mute">Searching</p> : null}
           {suggestions.length > 0 ? (
             <div className="border-t border-white/5">
               {suggestions.map((product) => (
@@ -240,6 +287,7 @@ export function Header() {
                 <Icon name="search" className="h-4 w-4" />
               </button>
             </div>
+            {suggesting && searching ? <p className="absolute top-[calc(100%+8px)] right-0 z-20 w-full border border-gold/30 bg-panel px-4 py-2 text-sm text-mute">Searching</p> : null}
             {suggesting && suggestions.length > 0 ? (
               <div className="absolute top-[calc(100%+8px)] right-0 z-20 w-full border border-gold/30 bg-panel py-1">
                 {suggestions.map((product) => (

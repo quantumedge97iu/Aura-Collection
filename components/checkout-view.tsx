@@ -3,25 +3,23 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { paymentLabel, useClientReady, useStore, type PaymentMethod } from "@/components/store";
+import { paymentLabel, useStore, type PaymentMethod } from "@/components/store";
 import { Button, Container, EmptyState, Field, PageHeader, fieldClass } from "@/components/ui";
-import { getProduct } from "@/lib/catalog";
-import { cities } from "@/lib/content";
+import { ApiError } from "@/lib/api";
 import { cn, pkr } from "@/lib/format";
 import { arrivalDate, formatDay } from "@/lib/shipment";
 
 const methods: Array<{ id: PaymentMethod; title: string; text: string }> = [
   { id: "cod", title: "Cash on Delivery", text: "Pay when the parcel is in your hands." },
   { id: "bank", title: "Bank Transfer", text: "Transfer the total, then we pack the order." },
-  { id: "card", title: "Debit / Credit Card", text: "Preview only. The card is not charged." },
+  { id: "card", title: "Debit / Credit Card", text: "The last four digits are kept. Payment stays pending until it clears." },
 ];
 
 type Errors = Partial<Record<"name" | "phone" | "email" | "city" | "address" | "card" | "expiry" | "cvc", string>>;
 
 export function CheckoutView() {
   const router = useRouter();
-  const { cart, subtotal, placeOrder, session, city: savedCity, setDeliverTo } = useStore();
-  const ready = useClientReady();
+  const { ready, cart, subtotal, placeOrder, session, city: savedCity, setDeliverTo, cities } = useStore();
   const [payment, setPayment] = useState<PaymentMethod>("cod");
   const [name, setName] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
@@ -36,6 +34,8 @@ export function CheckoutView() {
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
   const [errors, setErrors] = useState<Errors>({});
+  const [formError, setFormError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   if (!ready) return <Container className="py-16 text-sm tracking-[0.16em] text-gold uppercase">Loading checkout</Container>;
 
@@ -60,18 +60,21 @@ export function CheckoutView() {
     if (address.trim().length < 8) next.address = "Add the street, area, and house number.";
     const digits = card.replace(/\s/g, "");
     if (payment === "card") {
-      if (!/^\d{16}$/.test(digits)) next.card = "Enter 16 digits. This preview does not charge it.";
+      if (!/^\d{16}$/.test(digits)) next.card = "Enter 16 digits. Only the last four are sent.";
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) next.expiry = "Use MM/YY.";
       if (!/^\d{3,4}$/.test(cvc)) next.cvc = "Enter the 3 or 4 digit code.";
     }
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    const order = placeOrder(
+    setBusy(true);
+    setFormError("");
+    placeOrder(
       { name: nameValue.trim(), phone: phone.trim(), email: emailValue.trim(), city: cityValue, address: address.trim(), notes: notes.trim() },
       payment,
       payment === "card" ? digits.slice(-4) : undefined,
-    );
-    if (order) router.push(`/order/${order.id}`);
+    ).then((order) => router.push(`/order/${order.number}`)).catch((reason: unknown) => {
+      setFormError(reason instanceof ApiError ? reason.message : "The order could not be placed.");
+    }).finally(() => setBusy(false));
   }
 
   return (
@@ -90,7 +93,7 @@ export function CheckoutView() {
               <label className="block">
                 <span className="mb-2 block text-[11px] tracking-[0.16em] text-mute uppercase">City</span>
                 <select value={cityValue} onChange={(event) => { setCity(event.target.value); setDeliverTo(event.target.value); }} className={cn(fieldClass, "bg-ink")}>
-                  {cities.map((item) => <option key={item}>{item}</option>)}
+                  {cities.map((item) => <option key={item.city}>{item.city}</option>)}
                 </select>
               </label>
               <div className="sm:col-span-2">
@@ -121,7 +124,7 @@ export function CheckoutView() {
                 <p className="text-cream">Bank Alfalah · Demo account</p>
                 <p>Title: Aura Loom Diamond</p>
                 <p>IBAN: PK00 AURA 0000 0000 1234 5678</p>
-                <p className="mt-2">Use your order number as the transfer reference. No money moves on this preview.</p>
+                <p className="mt-2">Use your order number as the transfer reference. The payment stays pending until it is recorded.</p>
               </div>
             ) : null}
             {payment === "card" ? (
@@ -140,28 +143,26 @@ export function CheckoutView() {
         <aside className="border border-gold/30 bg-panel p-5 sm:p-6 lg:sticky lg:top-28">
           <h2 className="font-serif text-2xl text-cream">Order</h2>
           <ul className="mt-4 divide-y divide-line">
-            {cart.map((line) => {
-              const product = getProduct(line.slug);
-              return (
-                <li key={`${line.slug}-${line.metal}-${line.size}`} className="flex gap-3 py-3">
+            {cart.map((line) => (
+                <li key={line.variantId} className="flex gap-3 py-3">
                   <div className="relative h-16 w-16 shrink-0 bg-card">
-                    {product ? <Image src={product.image} alt="" fill className="object-cover" sizes="64px" /> : null}
+                    {line.image ? <Image src={line.image} alt="" fill className="object-cover" sizes="64px" /> : null}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-cream">{product?.name ?? "Piece"}</p>
+                    <p className="truncate text-sm text-cream">{line.name}</p>
                     <p className="text-xs text-mute">{line.metal} · {line.size} · Qty {line.qty}</p>
                   </div>
                 </li>
-              );
-            })}
+            ))}
           </ul>
           <dl className="mt-2 space-y-2 border-t border-line pt-4 text-sm">
             <div className="flex justify-between text-mute"><dt>Subtotal</dt><dd>{pkr(subtotal)}</dd></div>
-            <div className="flex justify-between text-mute"><dt>Delivery</dt><dd>Free · {formatDay(arrivalDate(cityValue, new Date(), cart.some((line) => getProduct(line.slug)?.category === "bridal")).toISOString())}</dd></div>
-            <div className="flex justify-between text-cream"><dt>Total</dt><dd>{pkr(subtotal)}</dd></div>
+            <div className="flex justify-between text-mute"><dt>Delivery</dt><dd>{(cities.find((item) => item.city === cityValue)?.fee ?? 0) > 0 ? pkr(cities.find((item) => item.city === cityValue)?.fee ?? 0) : "Free"} · {formatDay(arrivalDate(cityValue, new Date(), false, cities.find((item) => item.city === cityValue)?.transitDays).toISOString())}</dd></div>
+            <div className="flex justify-between text-cream"><dt>Total</dt><dd>{pkr(subtotal + (cities.find((item) => item.city === cityValue)?.fee ?? 0))}</dd></div>
             <div className="flex justify-between text-mute"><dt>Method</dt><dd>{paymentLabel(payment)}</dd></div>
           </dl>
-          <Button type="submit" className="mt-6 w-full">Place order</Button>
+          {formError ? <p className="mt-4 text-sm text-blush">{formError}</p> : null}
+          <Button type="submit" className="mt-6 w-full" disabled={busy}>{busy ? "Placing order" : "Place order"}</Button>
         </aside>
       </form>
     </Container>

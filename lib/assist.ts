@@ -1,20 +1,20 @@
-import { products, type Product } from "@/lib/catalog";
+import type { Product } from "@/lib/catalog";
 import { pkr } from "@/lib/format";
 
 const tests: Array<[RegExp, (product: Product) => boolean]> = [
-  [/ring/, (product) => product.category === "rings" || product.appearsIn?.includes("rings") === true],
-  [/earring|jhumka|stud/, (product) => product.category === "earrings" || product.appearsIn?.includes("earrings") === true],
-  [/necklace|pendant|chain|haar/, (product) => product.category === "necklaces" || product.appearsIn?.includes("necklaces") === true],
+  [/ring/, (product) => product.category === "rings" || product.appearsIn.includes("rings")],
+  [/earring|jhumka|stud/, (product) => product.category === "earrings" || product.appearsIn.includes("earrings")],
+  [/necklace|pendant|chain|haar/, (product) => product.category === "necklaces" || product.appearsIn.includes("necklaces")],
   [/bracelet/, (product) => product.category === "bracelets"],
   [/bangle/, (product) => product.category === "bangles"],
-  [/bridal|wedding|dulhan/, (product) => product.category === "bridal" || product.appearsIn?.includes("bridal") === true],
+  [/bridal|wedding|dulhan/, (product) => product.category === "bridal" || product.appearsIn.includes("bridal")],
   [/\bmen\b|\bman\b|\bhim\b|husband|signet/, (product) => product.category === "men"],
-  [/diamond/, (product) => product.category === "diamonds" || product.appearsIn?.includes("diamonds") === true],
+  [/diamond/, (product) => product.category === "diamonds" || product.appearsIn.includes("diamonds")],
   [/bar|bullion|24k/, (product) => product.category === "gold" && product.slug.includes("bar")],
   [/gift|present/, (product) => product.tags.includes("gift")],
 ];
 
-export function concierge(message: string) {
+export function concierge(message: string, products: Product[]) {
   const query = message.toLowerCase();
   let list = products.slice();
 
@@ -49,7 +49,7 @@ export function concierge(message: string) {
   }
 
   return {
-    reply: "Nothing in the house matches that exactly. Try rings, a bridal set, or a budget such as under 50,000.",
+    reply: products.length === 0 ? "The collection is not reachable right now. Try again in a moment." : "Nothing in the house matches that exactly. Try rings, a bridal set, or a budget such as under 50,000.",
     products: [] as Product[],
   };
 }

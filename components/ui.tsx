@@ -108,16 +108,26 @@ export function Stars({ value }: { value: number }) {
   );
 }
 
-export function Quantity({ value, onChange }: { value: number; onChange: (value: number) => void }) {
+export function Quantity({ value, onChange, max = 8 }: { value: number; onChange: (value: number) => void; max?: number }) {
   return (
     <div className="inline-flex items-center border border-line">
       <button type="button" className="px-3 py-2 text-gold" onClick={() => onChange(Math.max(1, value - 1))} aria-label="Decrease quantity">
         <Icon name="minus" className="h-3.5 w-3.5" />
       </button>
       <span className="min-w-8 text-center text-sm">{value}</span>
-      <button type="button" className="px-3 py-2 text-gold" onClick={() => onChange(Math.min(8, value + 1))} aria-label="Increase quantity">
+      <button type="button" className="px-3 py-2 text-gold" onClick={() => onChange(Math.min(max, value + 1))} aria-label="Increase quantity" disabled={value >= max}>
         <Icon name="plus" className="h-3.5 w-3.5" />
       </button>
+    </div>
+  );
+}
+
+export function ProductGridSkeleton() {
+  return (
+    <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 sm:gap-4">
+      {Array.from({ length: 8 }, (_, index) => (
+        <div key={index} className="aspect-[3/4] animate-pulse border border-line bg-card" />
+      ))}
     </div>
   );
 }

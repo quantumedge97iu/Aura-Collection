@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/icons";
-import { type Order } from "@/components/store";
+import { paymentStatusLabel, type Order } from "@/components/store";
 import { cn, pkr } from "@/lib/format";
 import { formatDay, formatWhen, shipmentOf } from "@/lib/shipment";
 
@@ -40,9 +40,9 @@ export function ShipmentTrack({ order }: { order: Order }) {
           </button>
           <p className="mt-3 text-sm text-mute">{shipment.courier}</p>
           <p className="text-sm text-mute">{shipment.city}</p>
-          {order.payment === "cod" ? <p className="mt-2 text-sm text-gold-2">Collect {pkr(order.total)} on delivery</p> : null}
-          {order.payment === "bank" ? <p className="mt-2 text-sm text-mute">Bank transfer · reference {order.id}</p> : null}
-          {order.payment === "card" ? <p className="mt-2 text-sm text-mute">Card ending {order.cardLast4 ?? "----"} · not charged on this preview</p> : null}
+          {order.payment === "cod" && order.paymentStatus === "pending" ? <p className="mt-2 text-sm text-gold-2">Collect {pkr(order.total)} on delivery</p> : null}
+          {order.payment === "bank" ? <p className="mt-2 text-sm text-mute">Bank transfer · {paymentStatusLabel(order.paymentStatus)} · {order.number}</p> : null}
+          {order.payment === "card" ? <p className="mt-2 text-sm text-mute">Card ending {order.cardLast4 ?? "----"} · {paymentStatusLabel(order.paymentStatus)}</p> : null}
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export function ShipmentTrack({ order }: { order: Order }) {
           );
         })}
       </ol>
-      <p className="mt-6 text-xs leading-5 text-mute">Aura Dispatch moves this timeline from the order time and the delivery city. A live courier feed is not connected yet.</p>
+      <p className="mt-6 text-xs leading-5 text-mute">Aura Dispatch follows the order status recorded by the house.</p>
     </section>
   );
 }

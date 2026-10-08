@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Icon, type IconName } from "@/components/icons";
 import { ProductCard } from "@/components/product-card";
 import { Container } from "@/components/ui";
-import { categories, type Product } from "@/lib/catalog";
+import type { Category, Product } from "@/lib/catalog";
 
-export function CategoryStrip() {
+export function CategoryStrip({ categories }: { categories: Category[] }) {
   return (
     <section className="border-b border-gold/15 py-8 sm:py-10">
       <Container>
@@ -74,11 +74,12 @@ const trusts: Array<{ icon: IconName; title: string; text: string }> = [
   { icon: "refresh", title: "Easy Returns", text: "Hassle-free within 7 days" },
 ];
 
-export function TrustBar() {
+export function TrustBar({ items }: { items?: Array<{ icon: IconName; title: string; text: string }> }) {
+  const rows = items?.length ? items : trusts;
   return (
     <section className="border-y border-gold/15">
       <Container className="grid gap-6 py-8 sm:grid-cols-2 lg:grid-cols-4">
-        {trusts.map((item) => (
+        {rows.map((item) => (
           <div key={item.title} className="flex items-center gap-4">
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-gold/50 text-gold">
               <Icon name={item.icon} className="h-5 w-5" />

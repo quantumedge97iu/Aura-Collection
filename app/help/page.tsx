@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
 import { Container, PageHeader } from "@/components/ui";
-import { faqs } from "@/lib/content";
+import { editorialFaqs } from "@/lib/cms";
+import { faqs as fallbackFaqs } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Help",
   description: "Delivery, returns, payments, and how to reach Aura Loom Diamond.",
 };
 
-export default function HelpPage() {
+export default async function HelpPage() {
+  const published = await editorialFaqs();
+  const faqs = published?.length ? published.map((item) => ({ q: item.question, a: item.answer })) : fallbackFaqs;
   return (
     <Container className="py-10 sm:py-14">
       <PageHeader eyebrow="Care" title="Help & FAQ" subtitle="Delivery, hallmarks, returns, and the studio line." />

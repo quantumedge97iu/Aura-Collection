@@ -1,43 +1,3 @@
-export const cities = [
-  "Karachi",
-  "Lahore",
-  "Islamabad",
-  "Rawalpindi",
-  "Faisalabad",
-  "Multan",
-  "Peshawar",
-  "Quetta",
-  "Hyderabad",
-  "Sialkot",
-];
-
-export const reviews = [
-  {
-    name: "Ayesha Khan",
-    city: "Lahore",
-    rating: 5,
-    quote: "Absolutely stunning quality! The ring is even more beautiful in person. Highly recommended!",
-  },
-  {
-    name: "Fatima Rizwan",
-    city: "Karachi",
-    rating: 5,
-    quote: "Fast delivery and amazing customer service. The necklace is perfect.",
-  },
-  {
-    name: "Usman Ali",
-    city: "Islamabad",
-    rating: 5,
-    quote: "Great experience. Authentic products and smooth payment process.",
-  },
-  {
-    name: "Hira Shah",
-    city: "Multan",
-    rating: 4,
-    quote: "The bangle set arrived boxed and hallmarked. I sized up once and the exchange was simple.",
-  },
-];
-
 export const faqs = [
   {
     q: "How long does delivery take?",
@@ -45,7 +5,7 @@ export const faqs = [
   },
   {
     q: "Do you take cash on delivery?",
-    a: "Yes. Cash on delivery is available across Pakistan. You can also pay by bank transfer or card at checkout. Card payments on this preview are not charged.",
+    a: "Yes. Cash on delivery is available across Pakistan. You can also pay by bank transfer or card at checkout. A card payment stays pending until the house records it.",
   },
   {
     q: "How do returns work?",
@@ -57,7 +17,7 @@ export const faqs = [
   },
   {
     q: "Can I track an order?",
-    a: "Open Track Order and enter the order number (LJ-) or the tracking number (LX-). The timeline moves with the house schedule for your city. Orders stay on this device until a courier feed is connected.",
+    a: "Open Track Order and enter the order number with the email used at checkout. The timeline follows the status stored with the order.",
   },
   {
     q: "Do you resize rings?",
@@ -118,7 +78,7 @@ export const policies: Record<string, Policy> = {
     blocks: [
       {
         paragraphs: [
-          "Orders can be cancelled before they are packed. Cash on delivery orders are released with one message. Prepaid orders are reversed to the same method.",
+          "Orders can be cancelled before they are packed, while the status is still created or confirmed and payment is pending or failed. Cash on delivery reservations are released. Prepaid orders are reversed to the same method.",
           "Bridal pieces already in production can be cancelled within 24 hours of placing the order.",
         ],
       },
@@ -130,8 +90,8 @@ export const policies: Record<string, Policy> = {
     blocks: [
       {
         paragraphs: [
-          "This storefront keeps your bag, wishlist, and orders in local storage on your device. Nothing is sent to a server yet.",
-          "When the backend is connected, we will store only what an order needs: name, phone, address, and payment reference. Card numbers will be handled by the payment provider, not by Aura Loom Diamond.",
+          "Orders, addresses, and payments are stored in the shop database. Passwords stay with Supabase Auth and are not written into the shop tables.",
+          "A card checkout keeps only the last four digits. The payment stays pending until Aura Loom Diamond records it. Card numbers are not stored here.",
         ],
       },
     ],
@@ -143,8 +103,7 @@ export const policies: Record<string, Policy> = {
       {
         paragraphs: [
           "Pieces are described by metal, size, and finish. Photographs are of the house collection and can vary slightly in stone placement.",
-          "Prices are in Pakistani rupees and include insured delivery. Title passes when the parcel is delivered, or when a cash on delivery payment is collected.",
-          "The checkout on this preview confirms an order on your device. It does not charge a card or move money.",
+          "Prices are in Pakistani rupees. The amount due is the total stored with the order. Title passes when the parcel is delivered, or when a cash on delivery payment is collected.",
         ],
       },
     ],

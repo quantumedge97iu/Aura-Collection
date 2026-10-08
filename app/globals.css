@@ -24,12 +24,12 @@ body {
 }
 
 ::selection {
-  background: #c6a36a;
-  color: #1a140c;
+  background: var(--color-gold);
+  color: var(--color-ink);
 }
 
 :focus-visible {
-  outline: 1px solid #c6a36a;
+  outline: 1px solid var(--color-gold);
   outline-offset: 3px;
 }
 
@@ -43,7 +43,7 @@ body {
 
 .aura-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #c6a36a transparent;
+  scrollbar-color: var(--color-gold) transparent;
 }
 
 .aura-scroll::-webkit-scrollbar {
@@ -51,7 +51,7 @@ body {
 }
 
 .aura-scroll::-webkit-scrollbar-thumb {
-  background: #c6a36a;
+  background: var(--color-gold);
 }
 
 .hero-photo {

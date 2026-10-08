@@ -1,13 +1,23 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { EditorialSplit } from "@/components/editorial-blocks";
 import { ButtonLink, Container } from "@/components/ui";
+import Image from "next/image";
+import { editorialLanding } from "@/lib/cms";
 
-export const metadata: Metadata = {
-  title: "Our Story",
-  description: "The house behind Aura Loom Diamond.",
-};
+export const dynamic = "force-dynamic";
 
-export default function StoryPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await editorialLanding("story");
+  return { title: page?.seo?.title || "Our Story", description: page?.seo?.description || "The house behind Aura Loom Diamond." };
+}
+
+export default async function StoryPage() {
+  const page = await editorialLanding("story");
+  const split = page?.sections?.find((section) => section._type === "editorialSplit");
+  if (split?._type === "editorialSplit" && split.title) {
+    return <EditorialSplit eyebrow={split.eyebrow || page?.eyebrow} title={split.title} paragraphs={split.paragraphs} href={split.href} cta={split.cta} image={split.image} alt={split.alt} />;
+  }
+
   return (
     <Container className="py-10 sm:py-14">
       <div className="grid items-center gap-10 lg:grid-cols-2">

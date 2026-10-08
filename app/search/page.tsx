@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { ProductCard } from "@/components/product-card";
 import { Container, EmptyState, PageHeader } from "@/components/ui";
-import { searchProducts } from "@/lib/catalog";
+import { fetchSearch } from "@/lib/shop";
 
 export const metadata: Metadata = { title: "Search" };
+
+export const dynamic = "force-dynamic";
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q = "" } = await searchParams;
   const query = q.trim();
-  const results = searchProducts(query);
+  const results = query ? await fetchSearch(query) : [];
 
   return (
     <Container className="py-10 sm:py-14">

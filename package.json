@@ -6,10 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "link:cms": "node scripts/link-cms.mjs",
+    "worker": "tsx lib/server/worker.ts",
+    "test": "tsx --test tests/unit.test.ts tests/integration.test.ts",
+    "test:perf": "tsx tests/perf.ts"
   },
   "dependencies": {
+    "groq": "^6.18.0",
+    "ioredis": "^5.8.1",
+    "jose": "^6.1.0",
     "next": "16.3.8",
+    "pg": "^8.16.3",
+    "zod": "^3.25.76",
     "postcss": "^8.5.28",
     "react": "19.2.8",
     "react-dom": "19.2.8"
@@ -22,6 +31,9 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@types/pg": "^8.15.5",
+    "embedded-postgres": "17.10.0-beta.17",
+    "tsx": "^4.20.6"
   }
 }
