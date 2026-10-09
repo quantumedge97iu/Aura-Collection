@@ -10,18 +10,23 @@ export function Newsletter() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  function submit(event: React.FormEvent) {
+  async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (!email.includes("@") || busy) return;
     setError("");
     setBusy(true);
-    api("/v1/subscribe", { method: "POST", body: JSON.stringify({ email: email.trim() }) })
-      .then(() => setDone(true))
-      .catch((reason: unknown) => setError(reason instanceof ApiError ? reason.message : "The list could not be saved."))
-      .finally(() => setBusy(false));
+    try {
+      await api("/v1/subscribe", { method: "POST", body: JSON.stringify({ email: email.trim() }) });
+      setDone(true);
+    } catch (reason: unknown) {
+      setError(reason instanceof ApiError ? reason.message : "The list could not be saved.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <form onSubmit={submit} className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
+    <form onSubmit={submit} className="flex w-full max-w-md flex-col gap-3 sm:flex-row sm:flex-wrap">
       {done ? (
         <p className="text-sm text-gold-2">You are on the list. New pieces will reach {email}.</p>
       ) : (
@@ -33,9 +38,12 @@ export function Newsletter() {
             onChange={(event) => setEmail(event.target.value)}
             placeholder="Enter your email address"
             aria-label="Email address"
-            className="h-11 min-w-0 flex-1 border border-gold/40 bg-transparent px-4 text-sm outline-none placeholder:text-mute focus:border-gold"
+            disabled={busy}
+            className="h-11 min-w-0 flex-1 border border-gold/40 bg-transparent px-4 text-sm outline-none placeholder:text-mute focus:border-gold disabled:opacity-60"
           />
-          <Button type="submit" className="h-11" disabled={busy}>{busy ? "Please wait" : "Subscribe"}</Button>
+          <Button type="submit" className="h-11" disabled={busy}>
+            {busy ? "Saving…" : "Subscribe"}
+          </Button>
         </>
       )}
       {error ? <p className="text-sm text-blush" role="alert">{error}</p> : null}
