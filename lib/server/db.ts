@@ -10,6 +10,9 @@ export function createPool(databaseUrl: string) {
   return new Pool({
     connectionString: databaseUrl,
     max: 10,
+    connectionTimeoutMillis: 5_000,
+    idleTimeoutMillis: 20_000,
+    statement_timeout: 8_000,
     ssl: hosted ? { rejectUnauthorized: false } : undefined,
   });
 }

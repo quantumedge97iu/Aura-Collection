@@ -310,10 +310,6 @@ export function Header({ categories, collections, chrome }: { categories: Catego
           <button type="button" className="grid h-10 w-10 shrink-0 place-items-center text-gold xl:hidden" aria-label="Search" onClick={() => setMobileSearch(true)}>
             <Icon name="search" className="h-5 w-5" />
           </button>
-          <Link href="/account" aria-label={accountName ? `${accountName} account` : "Account"} title={session?.email || "Account"} className="hidden h-10 max-w-[11rem] items-center gap-2 text-cream hover:text-gold sm:flex">
-            <Icon name="user" className="h-5 w-5 shrink-0" />
-            {ready && accountName ? <span className="min-w-0 truncate text-[12px] tracking-[0.02em] text-gold-2">{accountName}</span> : null}
-          </Link>
           <Link href="/wishlist" aria-label="Wishlist" className="relative grid h-10 w-10 place-items-center text-cream hover:text-gold">
             <Icon name="heart" className="h-5 w-5" />
             {ready && wishlist.length > 0 ? <span className="absolute top-1 right-1 grid h-4 min-w-4 place-items-center bg-gold px-1 text-[10px] text-ink">{wishlist.length}</span> : null}
@@ -321,6 +317,12 @@ export function Header({ categories, collections, chrome }: { categories: Catego
           <Link href="/cart" aria-label="Bag" className="relative grid h-10 w-10 place-items-center text-cream hover:text-gold">
             <Icon name="bag" className="h-5 w-5" />
             {ready && cartCount > 0 ? <span className="absolute top-1 right-1 grid h-4 min-w-4 place-items-center bg-gold px-1 text-[10px] text-ink">{cartCount}</span> : null}
+          </Link>
+          <Link href="/account" aria-label={accountName ? `${accountName} account` : "Account"} title={session?.email || "Account"} className="ml-1 flex h-10 max-w-[11rem] items-center gap-2 rounded-full border border-[#c6a36a]/55 bg-black/30 py-1 pr-1 pl-1 text-cream hover:border-[#e6d3ae] sm:pr-3">
+            <span className="grid h-8 w-8 shrink-0 overflow-hidden place-items-center rounded-full bg-gradient-to-b from-[#e6d3ae] to-[#c6a36a] text-ink">
+              {session?.avatarUrl ? <img src={session.avatarUrl} alt="" className="h-full w-full object-cover" /> : <Icon name="user" className="h-4 w-4" />}
+            </span>
+            {ready && accountName ? <span className="hidden min-w-0 truncate pr-1 text-[12px] tracking-[0.02em] text-gold-2 sm:inline">{accountName}</span> : null}
           </Link>
         </div>
       </Container>

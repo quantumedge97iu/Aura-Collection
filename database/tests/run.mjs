@@ -50,6 +50,9 @@ async function main() {
       "supabase/migrations/20261007120100_functions.sql",
       "supabase/migrations/20261007120200_rls.sql",
       "supabase/migrations/20261007120300_outbox.sql",
+      "supabase/migrations/20261009120000_read_model.sql",
+      "supabase/migrations/20261009130000_profile_avatars.sql",
+      "supabase/migrations/20261009140000_profile_details.sql",
       "supabase/seed.sql",
     ]) {
       console.log(`applying ${file}`);

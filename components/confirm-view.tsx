@@ -10,7 +10,7 @@ import { ApiError } from "@/lib/api";
 export function ConfirmView() {
   const router = useRouter();
   const { ready, acceptSession } = useStore();
-  const [message, setMessage] = useState("Confirming your email");
+  const [message, setMessage] = useState("Confirming your email. Your profile will open next.");
 
   useEffect(() => {
     if (!ready) return;
@@ -27,7 +27,10 @@ export function ConfirmView() {
       return;
     }
     acceptSession(token)
-      .then(() => router.replace("/account"))
+      .then(() => {
+        setMessage("Email confirmed. Opening your profile.");
+        router.replace("/account");
+      })
       .catch((reason: unknown) => {
         setMessage(reason instanceof ApiError ? reason.message : "The confirmation could not be finished.");
       });
@@ -36,7 +39,7 @@ export function ConfirmView() {
   return (
     <Container className="py-16">
       <PageHeader eyebrow="Account" title="Email confirmation" subtitle={message} />
-      <Link href="/account" className="mt-8 inline-block text-[11px] tracking-[0.16em] text-gold uppercase">Back to sign in</Link>
+      <Link href="/account" className="mt-8 inline-block text-[11px] tracking-[0.16em] text-gold uppercase">Open your profile</Link>
     </Container>
   );
 }

@@ -54,7 +54,7 @@ export type Address = {
   isDefaultShipping: boolean;
   isDefaultBilling: boolean;
 };
-type Session = { id: string; name: string; email: string; phone: string | null };
+type Session = { id: string; name: string; email: string; phone: string | null; avatarUrl: string | null };
 type Saved = { token: string | null; cartId: string | null; guestToken: string | null; city: string; orders: Order[] };
 
 const KEY = "luxe-api-v1";
@@ -190,6 +190,8 @@ type StoreValue = {
   acceptSession: (token: string) => Promise<void>;
   signOut: () => void;
   updateProfile: (input: { fullName: string; phone: string | null }) => Promise<void>;
+  uploadAvatar: (file: File) => Promise<void>;
+  clearAvatar: () => Promise<void>;
   addAddress: (input: { fullName: string; phone: string; line1: string; city: string; isDefaultShipping?: boolean }) => Promise<void>;
   removeAddress: (id: string) => Promise<void>;
   writeReview: (slug: string, input: { rating: number; title: string; body: string }) => Promise<void>;
@@ -209,6 +211,7 @@ export function StoreProvider({ children, cities }: { children: React.ReactNode;
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const toastTimers = useRef(new Map<string, number>());
   const bag = useRef({ token: null as string | null, cartId: null as string | null, guestToken: null as string | null, city: cities[0]?.city ?? "Karachi" });
+  const avatarBlob = useRef<string | null>(null);
   const cartRef = useRef(cart);
   const ordersRef = useRef(orders);
   const bootRef = useRef<Promise<void>>(Promise.resolve());
@@ -264,12 +267,13 @@ export function StoreProvider({ children, cities }: { children: React.ReactNode;
 
   const pullAccount = useCallback(async () => {
     const [me, wishes, mine, places] = await Promise.all([
-      api<{ id: string; fullName: string; email: string | null; phone: string | null }>("/v1/me", authHeaders()),
+      api<{ id: string; fullName: string; email: string | null; phone: string | null; avatarUrl: string | null }>("/v1/me", authHeaders()),
       api<{ items: Array<Record<string, unknown>> }>("/v1/wishlist", authHeaders()),
       api<{ items: Array<Record<string, unknown>> }>("/v1/orders", authHeaders()),
       api<{ items: Address[] }>("/v1/me/addresses", authHeaders()),
     ]);
-    setSession({ id: me.id, name: me.fullName, email: me.email ?? "", phone: me.phone });
+    const avatarUrl = me.avatarUrl ? await loadAvatar(bag.current.token, avatarBlob) : forgetAvatar(avatarBlob);
+    setSession({ id: me.id, name: me.fullName, email: me.email ?? "", phone: me.phone, avatarUrl });
     setWishlist(wishes.items.map((item) => toProduct(item as unknown as Parameters<typeof toProduct>[0])));
     setAddresses(places.items);
     const previous = ordersRef.current;
@@ -486,10 +490,10 @@ export function StoreProvider({ children, cities }: { children: React.ReactNode;
 
   const register = useCallback(async (name: string, email: string, password: string) => {
     const session = await api<{ accessToken?: string; confirmationRequired?: boolean }>("/v1/auth/register", { method: "POST", body: JSON.stringify({ email, password, fullName: name }) });
-    if (session.confirmationRequired) return "We sent a confirmation link to your email. Open it, then sign in.";
+    if (session.confirmationRequired) return "We sent a confirmation link to your email. Open it and your profile dashboard will open so you can save your details. After that, sign in from this page for full access.";
     if (!session.accessToken) throw new ApiError(401, "unauthorized", "The account was not created.");
     await adopt(session.accessToken);
-    flash(`Welcome, ${name.split(" ")[0]}`, "success");
+    flash("Account created. Complete your profile.", "success");
     return null;
   }, [adopt, flash]);
 
@@ -509,6 +513,7 @@ export function StoreProvider({ children, cities }: { children: React.ReactNode;
     bag.current.token = null;
     bag.current.cartId = null;
     bag.current.guestToken = null;
+    forgetAvatar(avatarBlob);
     setSession(null);
     setCart([]);
     setWishlist([]);
@@ -518,9 +523,26 @@ export function StoreProvider({ children, cities }: { children: React.ReactNode;
   }, [flash, persist]);
 
   const updateProfile = useCallback(async (input: { fullName: string; phone: string | null }) => {
-    const me = await api<{ id: string; fullName: string; email: string | null; phone: string | null }>("/v1/me", { method: "PATCH", body: JSON.stringify(input), token: bag.current.token });
-    setSession({ id: me.id, name: me.fullName, email: me.email ?? "", phone: me.phone });
+    const me = await api<{ id: string; fullName: string; email: string | null; phone: string | null; avatarUrl: string | null }>("/v1/me", { method: "PATCH", body: JSON.stringify(input), token: bag.current.token });
+    setSession((current) => ({ id: me.id, name: me.fullName, email: me.email ?? "", phone: me.phone, avatarUrl: current?.avatarUrl ?? null }));
     flash("Profile saved", "success");
+  }, [flash]);
+
+  const uploadAvatar = useCallback(async (file: File) => {
+    if (!bag.current.token) throw new ApiError(401, "unauthorized", "Sign in again.");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) throw new ApiError(400, "invalid_request", "Use a JPG, PNG, or WebP photo.");
+    if (file.size > 1_200_000) throw new ApiError(400, "invalid_request", "Use a photo under 1.2 MB.");
+    const data = await readPhoto(file);
+    await api("/v1/me/avatar", { method: "POST", body: JSON.stringify({ mime: file.type, data }), token: bag.current.token });
+    const avatarUrl = await loadAvatar(bag.current.token, avatarBlob);
+    setSession((current) => current ? { ...current, avatarUrl } : current);
+  }, []);
+
+  const clearAvatar = useCallback(async () => {
+    await api("/v1/me/avatar", { method: "DELETE", token: bag.current.token });
+    forgetAvatar(avatarBlob);
+    setSession((current) => current ? { ...current, avatarUrl: null } : current);
+    flash("Photo removed", "success");
   }, [flash]);
 
   const addAddress = useCallback(async (input: { fullName: string; phone: string; line1: string; city: string; isDefaultShipping?: boolean }) => {
@@ -552,8 +574,8 @@ export function StoreProvider({ children, cities }: { children: React.ReactNode;
   const value = useMemo<StoreValue>(() => ({
     ready, cart, wishlist, orders, addresses, session, city, cities, cartCount, subtotal, notice: toasts[0]?.message ?? null,
     addToCart, setQty, removeLine, toggleWish, wished, placeOrder, cancelOrder, lookupOrder, loadOrder,
-    setDeliverTo, signIn, register, resendConfirmation, requestPasswordReset, acceptSession, signOut, updateProfile, addAddress, removeAddress, writeReview,
-  }), [ready, cart, wishlist, orders, addresses, session, city, cities, cartCount, subtotal, toasts, addToCart, setQty, removeLine, toggleWish, wished, placeOrder, cancelOrder, lookupOrder, loadOrder, setDeliverTo, signIn, register, resendConfirmation, requestPasswordReset, acceptSession, signOut, updateProfile, addAddress, removeAddress, writeReview]);
+    setDeliverTo, signIn, register, resendConfirmation, requestPasswordReset, acceptSession, signOut, updateProfile, uploadAvatar, clearAvatar, addAddress, removeAddress, writeReview,
+  }), [ready, cart, wishlist, orders, addresses, session, city, cities, cartCount, subtotal, toasts, addToCart, setQty, removeLine, toggleWish, wished, placeOrder, cancelOrder, lookupOrder, loadOrder, setDeliverTo, signIn, register, resendConfirmation, requestPasswordReset, acceptSession, signOut, updateProfile, uploadAvatar, clearAvatar, addAddress, removeAddress, writeReview]);
 
   return (
     <StoreContext.Provider value={value}>
@@ -567,6 +589,34 @@ export function useStore() {
   const value = useContext(StoreContext);
   if (!value) throw new Error("useStore must be used within StoreProvider");
   return value;
+}
+
+function forgetAvatar(slot: { current: string | null }) {
+  if (slot.current) URL.revokeObjectURL(slot.current);
+  slot.current = null;
+  return null;
+}
+
+async function loadAvatar(token: string | null, slot: { current: string | null }) {
+  forgetAvatar(slot);
+  if (!token) return null;
+  const response = await fetch("/api/v1/me/avatar", { headers: { authorization: `Bearer ${token}` } });
+  if (!response.ok) return null;
+  const url = URL.createObjectURL(await response.blob());
+  slot.current = url;
+  return url;
+}
+
+function readPhoto(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result ?? "");
+      resolve(text.slice(text.indexOf(",") + 1));
+    };
+    reader.onerror = () => reject(new ApiError(400, "invalid_request", "The photo could not be read."));
+    reader.readAsDataURL(file);
+  });
 }
 
 export function paymentLabel(method: PaymentMethod) {

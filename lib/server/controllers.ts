@@ -152,6 +152,18 @@ export const controllers = {
     const body = parse(schemas.profile, ctx.body);
     return services.commerce.updateMe(ctx.actor, { fullName: body.fullName, phone: body.phone ?? null });
   },
+  async avatar(ctx: Ctx, services: Services) {
+    const file = await services.commerce.avatar(ctx.actor);
+    if (!file) throw new AppError(404, "not_found", "No profile photo.");
+    return new Response(new Uint8Array(file.bytes), { headers: { "content-type": file.mime, "cache-control": "private, max-age=300" } });
+  },
+  async saveAvatar(ctx: Ctx, services: Services) {
+    const body = parse(schemas.avatar, ctx.body);
+    return services.commerce.saveAvatar(ctx.actor, body.mime, body.data);
+  },
+  async clearAvatar(ctx: Ctx, services: Services) {
+    return services.commerce.clearAvatar(ctx.actor);
+  },
   async addresses(ctx: Ctx, services: Services) {
     return services.commerce.addresses(ctx.actor);
   },
@@ -238,5 +250,13 @@ export const controllers = {
   },
   async cost(ctx: Ctx, services: Services) {
     return services.admin.variantCost(ctx.actor, parse(schemas.id, ctx.params).id);
+  },
+  async subscribe(ctx: Ctx, services: Services) {
+    const body = parse(schemas.subscribe, ctx.body);
+    return services.commerce.subscribe(ctx.actor, body.email);
+  },
+  async contact(ctx: Ctx, services: Services) {
+    const body = parse(schemas.contact, ctx.body);
+    return services.commerce.contact(ctx.actor, body.name, body.email, body.message);
   },
 };

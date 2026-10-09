@@ -45,6 +45,9 @@ const routes: Array<RouteDoc & { limit?: number; handler: Handler }> = [
   { method: "POST", path: "/v1/orders/:id/cancel", auth: "customer", summary: "Cancel an unpaid order", handler: controllers.cancel },
   { method: "GET", path: "/v1/me", auth: "customer", summary: "Your profile", handler: controllers.me },
   { method: "PATCH", path: "/v1/me", auth: "customer", summary: "Update your profile", handler: controllers.updateMe },
+  { method: "GET", path: "/v1/me/avatar", auth: "customer", summary: "Your profile photo", handler: controllers.avatar },
+  { method: "POST", path: "/v1/me/avatar", auth: "customer", summary: "Save your profile photo", limit: 8, handler: controllers.saveAvatar },
+  { method: "DELETE", path: "/v1/me/avatar", auth: "customer", summary: "Remove your profile photo", handler: controllers.clearAvatar },
   { method: "GET", path: "/v1/me/addresses", auth: "customer", summary: "Your addresses", handler: controllers.addresses },
   { method: "POST", path: "/v1/me/addresses", auth: "customer", summary: "Add an address", handler: controllers.addAddress },
   { method: "DELETE", path: "/v1/me/addresses/:id", auth: "customer", summary: "Remove an address", handler: controllers.removeAddress },
@@ -66,6 +69,8 @@ const routes: Array<RouteDoc & { limit?: number; handler: Handler }> = [
   { method: "POST", path: "/v1/admin/products", auth: "manager", summary: "Create a product and its stock", handler: controllers.createProduct },
   { method: "PATCH", path: "/v1/admin/products/:slug", auth: "manager", summary: "Update a product", handler: controllers.updateProduct },
   { method: "GET", path: "/v1/admin/variants/:id", auth: "manager", summary: "Variant including cost", handler: controllers.cost },
+  { method: "POST", path: "/v1/subscribe", auth: "public", summary: "Save a newsletter email", limit: 8, handler: controllers.subscribe },
+  { method: "POST", path: "/v1/contact", auth: "public", summary: "Save a studio message", limit: 8, handler: controllers.contact },
 ];
 
 export type Runtime = {
@@ -111,6 +116,7 @@ export function getRuntime() {
     globalStore.luxeRuntime = runtime;
     return runtime;
   }
+  current.services = createRuntime(current.config, current.pool, current.cache).services;
   return current;
 }
 
@@ -152,6 +158,10 @@ export async function dispatch(request: Request, runtime: Runtime = getRuntime()
       params: found.params,
       header: (name) => request.headers.get(name) ?? undefined,
     }, runtime.services);
+    if (result instanceof Response) {
+      result.headers.set("x-request-id", requestId);
+      return result;
+    }
     return json(request.method === "POST" ? 201 : 200, result ?? { ok: true }, requestId);
   } catch (error) {
     const mapped = mapDbError(error);

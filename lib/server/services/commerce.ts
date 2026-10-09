@@ -241,7 +241,25 @@ export function createCommerceService(pool: pg.Pool, cache: Kv) {
     },
     async updateMe(actor: Actor, input: { fullName: string; phone: string | null }) {
       if (!actor.id) throw new AppError(401, "unauthorized", "Sign in again.");
-      await withActor(pool, actor, (db) => repo.updateProfile(db, actor.id as string, input.fullName, input.phone));
+      await withActor(pool, actor, (db) => repo.updateProfile(db, actor.id as string, input.fullName, input.phone, actor.email));
+      return this.me(actor);
+    },
+    async avatar(actor: Actor) {
+      if (!actor.id) throw new AppError(401, "unauthorized", "Sign in again.");
+      const file = await withActor(pool, actor, (db) => repo.readAvatar(db, actor.id as string));
+      if (!file) return null;
+      const bytes = file.bytes instanceof Buffer ? file.bytes : Buffer.from(file.bytes);
+      return { mime: file.mime, bytes };
+    },
+    async saveAvatar(actor: Actor, mime: string, data: string) {
+      if (!actor.id) throw new AppError(401, "unauthorized", "Sign in again.");
+      const bytes = decodeAvatar(mime, data);
+      await withActor(pool, actor, (db) => repo.saveAvatar(db, actor.id as string, mime, bytes));
+      return this.me(actor);
+    },
+    async clearAvatar(actor: Actor) {
+      if (!actor.id) throw new AppError(401, "unauthorized", "Sign in again.");
+      await withActor(pool, actor, (db) => repo.clearAvatar(db, actor.id as string));
       return this.me(actor);
     },
     async addresses(actor: Actor) {
@@ -259,7 +277,29 @@ export function createCommerceService(pool: pg.Pool, cache: Kv) {
       const removed = await withActor(pool, actor, (db) => repo.deleteAddress(db, actor.id as string, addressId));
       if (!removed) throw new AppError(404, "not_found", "Address not found.");
     },
+    async subscribe(actor: Actor, email: string) {
+      await withActor(pool, actor, (db) => repo.subscribe(db, email.toLowerCase()));
+      return { ok: true };
+    },
+    async contact(actor: Actor, name: string, email: string, body: string) {
+      await withActor(pool, actor, (db) => repo.saveMessage(db, name, email.toLowerCase(), body));
+      return { ok: true };
+    },
   };
+}
+
+function decodeAvatar(mime: string, data: string) {
+  const payload = data.includes(",") ? data.slice(data.indexOf(",") + 1) : data;
+  const bytes = Buffer.from(payload, "base64");
+  if (bytes.length < 32 || bytes.length > 1_200_000) {
+    throw new AppError(400, "invalid_request", "Use a photo under 1.2 MB.");
+  }
+  const jpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  const png = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
+  const webp = bytes.length > 12 && bytes.subarray(0, 4).toString("ascii") === "RIFF" && bytes.subarray(8, 12).toString("ascii") === "WEBP";
+  const matches = (mime === "image/jpeg" && jpeg) || (mime === "image/png" && png) || (mime === "image/webp" && webp);
+  if (!matches) throw new AppError(400, "invalid_request", "Use a JPG, PNG, or WebP photo.");
+  return bytes;
 }
 
 function camelAddress(row: Record<string, unknown>) {

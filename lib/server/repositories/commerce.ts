@@ -74,16 +74,14 @@ export async function wishlistId(db: Db, customerId: string) {
 
 export async function wishlistItems(db: Db, customerId: string) {
   return rows(db, `
-    select p.id, p.slug, p.name, p.image_url,
-      (select min(v.price) from variants v where v.product_id = p.id and v.status = 'active') as price,
-      coalesce((select json_agg(distinct v.metal) from variants v where v.product_id = p.id and v.status = 'active'), '[]'::json) as metals,
-      (select json_build_object('id', v.id, 'sku', v.sku, 'metal', v.metal, 'size', v.size, 'price', v.price, 'available', i.available)
-       from variants v join inventory_levels i on i.variant_id = v.id
-       where v.product_id = p.id and v.status = 'active'
-       order by v.price, v.metal, v.size limit 1) as default_variant
+    select c.product_id as id, c.slug, c.name, c.image_url, c.min_price as price, to_json(c.metals) as metals,
+      case when c.default_variant is null then null
+           else c.default_variant || jsonb_build_object('available', coalesce(i.available, 0))
+      end as default_variant
     from wishlists w
     join wishlist_items wi on wi.wishlist_id = w.id
-    join products p on p.id = wi.product_id
+    join product_cards c on c.product_id = wi.product_id
+    left join inventory_levels i on i.variant_id = (c.default_variant->>'id')::uuid
     where w.customer_id = $1
     order by wi.created_at desc
   `, [customerId]);
@@ -228,12 +226,13 @@ export async function profile(db: Db, id: string) {
   return found[0] ?? null;
 }
 
-export async function ensureProfile(db: Db, id: string, fullName: string) {
+export async function ensureProfile(db: Db, id: string, fullName: string, email: string | null) {
   const found = await rows<{ id: string }>(db, `
-    insert into profiles (id, full_name) values ($1, $2)
+    insert into profiles (id, full_name, email) values ($1, $2, $3)
     on conflict (id) do nothing
     returning id
-  `, [id, fullName]);
+  `, [id, fullName, email]);
+  if (email) await rows(db, "update profiles set email = $2 where id = $1 and email is distinct from $2", [id, email]);
   return found[0]?.id ?? null;
 }
 
@@ -241,8 +240,27 @@ export async function fillProfileName(db: Db, id: string, fullName: string) {
   await rows(db, "update profiles set full_name = $2 where id = $1 and full_name = ''", [id, fullName]);
 }
 
-export async function updateProfile(db: Db, id: string, fullName: string, phone: string | null) {
-  await rows(db, "update profiles set full_name = $2, phone = $3 where id = $1", [id, fullName, phone]);
+export async function updateProfile(db: Db, id: string, fullName: string, phone: string | null, email: string | null) {
+  await rows(db, "update profiles set full_name = $2, phone = $3, email = coalesce($4, email) where id = $1", [id, fullName, phone, email]);
+}
+
+export async function saveAvatar(db: Db, id: string, mime: string, bytes: Buffer) {
+  await rows(db, `
+    insert into profile_avatars (customer_id, mime, bytes)
+    values ($1, $2, $3)
+    on conflict (customer_id) do update set mime = excluded.mime, bytes = excluded.bytes, updated_at = now()
+  `, [id, mime, bytes]);
+  await rows(db, "update profiles set avatar_url = '/v1/me/avatar' where id = $1", [id]);
+}
+
+export async function readAvatar(db: Db, id: string) {
+  const found = await rows<{ mime: string; bytes: Buffer }>(db, "select mime, bytes from profile_avatars where customer_id = $1", [id]);
+  return found[0] ?? null;
+}
+
+export async function clearAvatar(db: Db, id: string) {
+  await rows(db, "delete from profile_avatars where customer_id = $1", [id]);
+  await rows(db, "update profiles set avatar_url = null where id = $1", [id]);
 }
 
 export async function addresses(db: Db, customerId: string) {
@@ -265,4 +283,12 @@ export async function insertAddress(db: Db, customerId: string, input: Record<st
 export async function deleteAddress(db: Db, customerId: string, addressId: string) {
   const found = await rows(db, "delete from addresses where id = $1 and customer_id = $2 returning id", [addressId, customerId]);
   return found.length > 0;
+}
+
+export async function subscribe(db: Db, email: string) {
+  await rows(db, "insert into subscribers (email) values ($1) on conflict ((lower(email))) do nothing", [email]);
+}
+
+export async function saveMessage(db: Db, name: string, email: string, body: string) {
+  await rows(db, "insert into contact_messages (name, email, body) values ($1, $2, $3)", [name, email, body]);
 }

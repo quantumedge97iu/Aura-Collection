@@ -53,13 +53,13 @@ export function createAuthService(pool: pg.Pool, config: Config) {
     },
     async login(email: string, password: string) {
       const session = await signIn(goTrue(), email, password);
-      await this.ensure(session.userId, session.fullName);
+      await this.ensure(session.userId, session.fullName, session.email);
       return { accessToken: session.accessToken };
     },
     async register(email: string, password: string, fullName: string, origin?: string) {
       const session = await signUp(goTrue(), email, password, fullName, appUrl(origin, "/auth/confirm"));
       if ("confirmationRequired" in session) return session;
-      await this.ensure(session.userId, fullName);
+      await this.ensure(session.userId, fullName, email);
       return { accessToken: session.accessToken };
     },
     async resend(email: string, origin?: string) {
@@ -74,9 +74,9 @@ export function createAuthService(pool: pg.Pool, config: Config) {
       await updatePassword(goTrue(), accessToken, password);
       return { ok: true };
     },
-    async ensure(userId: string, fullName: string) {
+    async ensure(userId: string, fullName: string, email?: string | null) {
       await withActor(pool, { ...guest, id: userId, jwtRole: "authenticated" }, async (db) => {
-        const created = await repo.ensureProfile(db, userId, fullName);
+        const created = await repo.ensureProfile(db, userId, fullName, email ? email.toLowerCase() : null);
         if (fullName) await repo.fillProfileName(db, userId, fullName);
         if (!created) return;
         await enqueue(db, {

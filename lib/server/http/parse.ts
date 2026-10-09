@@ -27,6 +27,8 @@ export const schemas = {
     sort: z.enum(["featured", "price-asc", "price-desc", "rating"]).optional(),
   }),
   search: z.object({ q: z.string().trim().min(1).max(80), limit: z.coerce.number().int().min(1).max(48).default(24) }),
+  subscribe: z.object({ email: z.string().trim().email().max(160) }),
+  contact: z.object({ name: z.string().trim().min(3).max(80), email: z.string().trim().email().max(160), message: z.string().trim().min(10).max(2000) }),
   slug: z.object({ slug: z.string().trim().min(1) }),
   id: z.object({ id: z.string().uuid() }),
   cartItem: z.object({ variantId: z.string().uuid(), quantity: z.number().int().min(1).max(8).default(1) }),
@@ -47,6 +49,7 @@ export const schemas = {
   reserve: z.object({ cartId: z.string().uuid(), variantId: z.string().uuid(), quantity: z.number().int().min(1).max(8), idempotencyKey: z.string().min(8) }),
   review: z.object({ rating: z.number().int().min(1).max(5), title: z.string().trim().max(120).default(""), body: z.string().trim().min(4).max(2000) }),
   profile: z.object({ fullName: z.string().trim().min(3), phone: z.string().trim().min(7).nullable().optional() }),
+  avatar: z.object({ mime: z.enum(["image/jpeg", "image/png", "image/webp"]), data: z.string().min(32).max(1_800_000) }),
   address: z.object({
     fullName: z.string().trim().min(3),
     phone: z.string().trim().min(7),

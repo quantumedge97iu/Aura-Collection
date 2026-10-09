@@ -19,16 +19,19 @@ type Errors = Partial<Record<"name" | "phone" | "email" | "city" | "address" | "
 
 export function CheckoutView() {
   const router = useRouter();
-  const { ready, cart, subtotal, placeOrder, session, city: savedCity, setDeliverTo, cities } = useStore();
+  const { ready, cart, subtotal, placeOrder, session, addresses, city: savedCity, setDeliverTo, cities } = useStore();
+  const savedPlace = addresses.find((item) => item.isDefaultShipping) ?? addresses[0];
   const [payment, setPayment] = useState<PaymentMethod>("cod");
   const [name, setName] = useState<string | null>(null);
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
-  const nameValue = name ?? session?.name ?? "";
+  const nameValue = name ?? savedPlace?.fullName ?? session?.name ?? "";
+  const phoneValue = phone ?? session?.phone ?? savedPlace?.phone ?? "";
   const emailValue = email ?? session?.email ?? "";
   const [city, setCity] = useState<string | null>(null);
-  const cityValue = city ?? savedCity;
-  const [address, setAddress] = useState("");
+  const cityValue = city ?? savedPlace?.city ?? savedCity;
+  const [address, setAddress] = useState<string | null>(null);
+  const addressValue = address ?? savedPlace?.line1 ?? "";
   const [notes, setNotes] = useState("");
   const [card, setCard] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -54,10 +57,10 @@ export function CheckoutView() {
     event.preventDefault();
     const next: Errors = {};
     if (nameValue.trim().length < 3) next.name = "Enter the full name for the parcel.";
-    if (!/^(\+92|0)?3\d{9}$/.test(phone.replace(/\s/g, ""))) next.phone = "Use a Pakistan mobile number.";
+    if (!/^(\+92|0)?3\d{9}$/.test(phoneValue.replace(/\s/g, ""))) next.phone = "Use a Pakistan mobile number.";
     if (!emailValue.includes("@") || !emailValue.includes(".")) next.email = "Enter a valid email.";
     if (!cityValue) next.city = "Choose a city.";
-    if (address.trim().length < 8) next.address = "Add the street, area, and house number.";
+    if (addressValue.trim().length < 8) next.address = "Add the street, area, and house number.";
     const digits = card.replace(/\s/g, "");
     if (payment === "card") {
       if (!/^\d{16}$/.test(digits)) next.card = "Enter 16 digits. Only the last four are sent.";
@@ -69,7 +72,7 @@ export function CheckoutView() {
     setBusy(true);
     setFormError("");
     placeOrder(
-      { name: nameValue.trim(), phone: phone.trim(), email: emailValue.trim(), city: cityValue, address: address.trim(), notes: notes.trim() },
+      { name: nameValue.trim(), phone: phoneValue.trim(), email: emailValue.trim(), city: cityValue, address: addressValue.trim(), notes: notes.trim() },
       payment,
       payment === "card" ? digits.slice(-4) : undefined,
     ).then((order) => router.push(`/order/${order.number}`)).catch((reason: unknown) => {
@@ -84,9 +87,10 @@ export function CheckoutView() {
         <div className="space-y-8">
           <section className="border border-line p-4 sm:p-6">
             <h2 className="font-serif text-2xl text-cream">1. Where it ships</h2>
+            {savedPlace ? <p className="mt-2 text-sm text-mute">Filled from the address saved on your account. Change anything before you pay.</p> : null}
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <Field label="Full name" value={nameValue} onChange={(event) => setName(event.target.value)} error={errors.name} autoComplete="name" />
-              <Field label="Phone" value={phone} onChange={(event) => setPhone(event.target.value)} error={errors.phone} placeholder="03XX XXXXXXX" autoComplete="tel" />
+              <Field label="Phone" value={phoneValue} onChange={(event) => setPhone(event.target.value)} error={errors.phone} placeholder="03XX XXXXXXX" autoComplete="tel" />
               <div className="sm:col-span-2">
                 <Field label="Email" type="email" value={emailValue} onChange={(event) => setEmail(event.target.value)} error={errors.email} autoComplete="email" />
               </div>
@@ -97,7 +101,7 @@ export function CheckoutView() {
                 </select>
               </label>
               <div className="sm:col-span-2">
-                <Field label="Address" value={address} onChange={(event) => setAddress(event.target.value)} error={errors.address} autoComplete="street-address" />
+                <Field label="Address" value={addressValue} onChange={(event) => setAddress(event.target.value)} error={errors.address} autoComplete="street-address" />
               </div>
               <label className="block sm:col-span-2">
                 <span className="mb-2 block text-[11px] tracking-[0.16em] text-mute uppercase">Notes</span>
