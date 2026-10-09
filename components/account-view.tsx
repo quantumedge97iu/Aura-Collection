@@ -91,12 +91,10 @@ function ClientAccount() {
   }
 
   return (
-    <div className="grid items-start gap-5 lg:grid-cols-[248px_minmax(0,1fr)] lg:gap-6">
+    <div className="grid w-full items-start gap-5 lg:grid-cols-[248px_minmax(0,1fr)] lg:gap-6">
       <aside className="relative overflow-hidden rounded-2xl border border-[#c6a36a]/40 bg-[#0c0b09] px-4 py-6 lg:sticky lg:top-24">
         <div className="flex flex-col items-center text-center">
-          <span className="grid h-[88px] w-[88px] overflow-hidden place-items-center rounded-full border border-[#c6a36a]/70 bg-gradient-to-b from-[#2a241c] to-[#14110e] font-serif text-3xl text-[#e6d3ae]">
-            {portrait ? <img src={portrait} alt="" className="h-full w-full object-cover" /> : initials}
-          </span>
+          <Portrait src={portrait} initials={initials} size={88} />
           <p className="mt-4 font-serif text-2xl text-cream">{displayName}</p>
           <p className="mt-1 text-xs text-mute">View and manage your account</p>
         </div>
@@ -194,9 +192,7 @@ function ClientAccount() {
                   }}
                 >
                   <div className="flex items-center gap-4">
-                    <span className="grid h-20 w-20 shrink-0 overflow-hidden place-items-center rounded-full border border-[#c6a36a]/50 bg-[#1a1612] font-serif text-2xl text-[#e6d3ae]">
-                      {portrait ? <img src={portrait} alt="" className="h-full w-full object-cover" /> : initials}
-                    </span>
+                    <Portrait src={portrait} initials={initials} size={80} />
                     <span className="grid gap-2">
                       <label className="inline-flex h-10 w-fit cursor-pointer items-center rounded-full border border-[#c6a36a]/60 px-4 text-[11px] tracking-[0.14em] text-gold uppercase hover:bg-gold hover:text-ink">
                         Upload photo
@@ -710,6 +706,21 @@ function AuthButton({ busy, label }: { busy: boolean; label: string }) {
       <span aria-hidden>←</span>
       {label}
     </button>
+  );
+}
+
+function Portrait({ src, initials, size }: { src: string | null; initials: string; size: number }) {
+  return (
+    <span
+      className="relative block shrink-0 overflow-hidden rounded-full border border-[#c6a36a]/70 bg-gradient-to-b from-[#2a241c] to-[#14110e] font-serif text-[#e6d3ae]"
+      style={{ width: size, height: size, minWidth: size, minHeight: size, maxWidth: size, maxHeight: size }}
+    >
+      {src ? (
+        <img src={src} alt="" className="absolute inset-0 object-cover" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      ) : (
+        <span className="grid h-full w-full place-items-center" style={{ fontSize: size > 70 ? 28 : 22 }}>{initials}</span>
+      )}
+    </span>
   );
 }
 

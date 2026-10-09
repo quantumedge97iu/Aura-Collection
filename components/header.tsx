@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Icon } from "@/components/icons";
 import { useStore } from "@/components/store";
@@ -58,7 +58,7 @@ export function Header({ categories, collections, chrome }: { categories: Catego
   const helpHref = chrome?.helpHref || "/help";
   const pathname = usePathname();
   const router = useRouter();
-  const { ready, session, cartCount, wishlist, city, setDeliverTo, cities } = useStore();
+  const { ready, session, cartCount, wishlist, city, setDeliverTo, cities, signOut } = useStore();
   const accountName = session?.name.trim() || session?.email || "";
   const [menu, setMenu] = useState(false);
   const [open, setOpen] = useState<"shop" | "collections" | null>(null);
@@ -68,6 +68,8 @@ export function Header({ categories, collections, chrome }: { categories: Catego
   const [mounted, setMounted] = useState(false);
   const [suggestions, setSuggestions] = useState<Array<{ slug: string; name: string }>>([]);
   const [searching, setSearching] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const q = query.trim();
@@ -87,11 +89,28 @@ export function Header({ categories, collections, chrome }: { categories: Catego
     setOpen(null);
     setMobileSearch(false);
     setSuggesting(false);
+    setAccountOpen(false);
   }, [pathname]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!accountOpen) return;
+    function close(event: MouseEvent) {
+      if (!accountRef.current?.contains(event.target as Node)) setAccountOpen(false);
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setAccountOpen(false);
+    }
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [accountOpen]);
 
   useEffect(() => {
     document.body.style.overflow = menu ? "hidden" : "";
@@ -318,12 +337,28 @@ export function Header({ categories, collections, chrome }: { categories: Catego
             <Icon name="bag" className="h-5 w-5" />
             {ready && cartCount > 0 ? <span className="absolute top-1 right-1 grid h-4 min-w-4 place-items-center bg-gold px-1 text-[10px] text-ink">{cartCount}</span> : null}
           </Link>
-          <Link href="/account" aria-label={accountName ? `${accountName} account` : "Account"} title={session?.email || "Account"} className="ml-1 flex h-10 max-w-[11rem] items-center gap-2 rounded-full border border-[#c6a36a]/55 bg-black/30 py-1 pr-1 pl-1 text-cream hover:border-[#e6d3ae] sm:pr-3">
-            <span className="grid h-8 w-8 shrink-0 overflow-hidden place-items-center rounded-full bg-gradient-to-b from-[#e6d3ae] to-[#c6a36a] text-ink">
-              {session?.avatarUrl ? <img src={session.avatarUrl} alt="" className="h-full w-full object-cover" /> : <Icon name="user" className="h-4 w-4" />}
-            </span>
-            {ready && accountName ? <span className="hidden min-w-0 truncate pr-1 text-[12px] tracking-[0.02em] text-gold-2 sm:inline">{accountName}</span> : null}
-          </Link>
+          <div className="relative ml-1" ref={accountRef}>
+            {session ? (
+              <button type="button" aria-expanded={accountOpen} aria-haspopup="menu" aria-label={`${accountName || "Account"} menu`} onClick={() => setAccountOpen((value) => !value)} className="flex h-10 max-w-[11rem] items-center gap-2 rounded-full border border-[#c6a36a]/55 bg-black/30 py-1 pr-1 pl-1 text-cream hover:border-[#e6d3ae] sm:pr-3">
+                <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded-full bg-gradient-to-b from-[#e6d3ae] to-[#c6a36a] text-ink" style={{ width: 32, height: 32 }}>
+                  {session.avatarUrl ? <img src={session.avatarUrl} alt="" className="absolute inset-0 object-cover" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Icon name="user" className="absolute top-1/2 left-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2" />}
+                </span>
+                {ready && accountName ? <span className="hidden min-w-0 truncate pr-1 text-[12px] tracking-[0.02em] text-gold-2 sm:inline">{accountName}</span> : null}
+              </button>
+            ) : (
+              <Link href="/account" aria-label="Account" title="Account" className="flex h-10 max-w-[11rem] items-center gap-2 rounded-full border border-[#c6a36a]/55 bg-black/30 py-1 pr-1 pl-1 text-cream hover:border-[#e6d3ae] sm:pr-3">
+                <span className="relative block h-8 w-8 shrink-0 overflow-hidden rounded-full bg-gradient-to-b from-[#e6d3ae] to-[#c6a36a] text-ink" style={{ width: 32, height: 32 }}>
+                  <Icon name="user" className="absolute top-1/2 left-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2" />
+                </span>
+              </Link>
+            )}
+            {session && accountOpen ? (
+              <div role="menu" className="absolute top-[calc(100%+8px)] right-0 z-30 min-w-44 border border-gold/40 bg-ink py-1 shadow-2xl">
+                <Link href="/account" role="menuitem" onClick={() => setAccountOpen(false)} className="block px-4 py-2.5 text-sm text-cream hover:bg-white/5 hover:text-gold">My account</Link>
+                <button type="button" role="menuitem" onClick={() => { setAccountOpen(false); signOut(); }} className="block w-full px-4 py-2.5 text-left text-sm text-cream hover:bg-white/5 hover:text-gold">Log out</button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </Container>
 
