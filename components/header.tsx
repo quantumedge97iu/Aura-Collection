@@ -171,8 +171,7 @@ export function Header({ categories, collections, chrome }: { categories: Catego
       <div className="hidden border-b border-white/5 text-[11px] text-mute sm:block">
         <Container className="flex h-9 items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3 lg:gap-6">
-            <span className="inline-flex min-w-0 items-center gap-1.5"><Icon name="truck" className="h-3.5 w-3.5 shrink-0 text-gold" /> <span className="truncate">{chrome?.deliveryLabel || "Free delivery"}<span className="hidden lg:inline"> {chrome?.deliveryDetail || "across Pakistan"}</span></span></span>
-            <span className="hidden items-center gap-1.5 md:inline-flex"><Icon name="card" className="h-3.5 w-3.5 text-gold" /> <span className="hidden lg:inline">{chrome?.paymentLabel || "Cash on delivery"}</span><span className="lg:hidden">{chrome?.paymentShort || "COD"}</span></span>
+            <span className="inline-flex items-center gap-1.5"><Icon name="card" className="h-3.5 w-3.5 text-gold" /> <span className="hidden lg:inline">{chrome?.paymentLabel || "Cash on delivery"}</span><span className="lg:hidden">{chrome?.paymentShort || "COD"}</span></span>
             <span className="hidden items-center gap-1.5 xl:inline-flex"><Icon name="shield" className="h-3.5 w-3.5 text-gold" /> {chrome?.secureLabel || "Secure payments"}</span>
           </div>
           <div className="flex shrink-0 items-center gap-3 lg:gap-4">

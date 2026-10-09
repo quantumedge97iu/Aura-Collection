@@ -259,6 +259,10 @@ export function createCommerceService(pool: pg.Pool, cache: Kv) {
       const removed = await withActor(pool, actor, (db) => repo.deleteAddress(db, actor.id as string, addressId));
       if (!removed) throw new AppError(404, "not_found", "Address not found.");
     },
+    async subscribeNewsletter(actor: Actor, email: string) {
+      const row = await withActor(pool, actor, (db) => repo.subscribeNewsletter(db, email));
+      return { ok: true, email: row.email };
+    },
   };
 }
 

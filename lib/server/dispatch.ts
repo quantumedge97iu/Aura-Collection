@@ -48,6 +48,7 @@ const routes: Array<RouteDoc & { limit?: number; handler: Handler }> = [
   { method: "GET", path: "/v1/me/addresses", auth: "customer", summary: "Your addresses", handler: controllers.addresses },
   { method: "POST", path: "/v1/me/addresses", auth: "customer", summary: "Add an address", handler: controllers.addAddress },
   { method: "DELETE", path: "/v1/me/addresses/:id", auth: "customer", summary: "Remove an address", handler: controllers.removeAddress },
+  { method: "POST", path: "/v1/newsletter", auth: "public", summary: "Subscribe an email to the newsletter", limit: 20, handler: controllers.subscribeNewsletter },
   { method: "POST", path: "/v1/auth/login", auth: "public", summary: "Sign in with Supabase Auth", handler: controllers.login },
   { method: "POST", path: "/v1/auth/register", auth: "public", summary: "Create a Supabase Auth user and send a confirmation email", handler: controllers.register },
   { method: "POST", path: "/v1/auth/resend", auth: "public", summary: "Resend the signup confirmation email", handler: controllers.resend },

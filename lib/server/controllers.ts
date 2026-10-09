@@ -162,6 +162,10 @@ export const controllers = {
     await services.commerce.removeAddress(ctx.actor, parse(schemas.id, ctx.params).id);
     return { ok: true };
   },
+  async subscribeNewsletter(ctx: Ctx, services: Services) {
+    const body = parse(schemas.newsletter, ctx.body);
+    return services.commerce.subscribeNewsletter(ctx.actor, body.email);
+  },
   async login(ctx: Ctx, services: Services) {
     const body = parse(schemas.credentials, ctx.body);
     return services.auth.login(body.email, body.password);

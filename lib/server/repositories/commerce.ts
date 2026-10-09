@@ -266,3 +266,17 @@ export async function deleteAddress(db: Db, customerId: string, addressId: strin
   const found = await rows(db, "delete from addresses where id = $1 and customer_id = $2 returning id", [addressId, customerId]);
   return found.length > 0;
 }
+
+export async function subscribeNewsletter(db: Db, email: string, source = "footer") {
+  const normalized = email.trim().toLowerCase();
+  const found = await rows<{ id: string; email: string }>(db, `
+    insert into newsletter_subscribers (email, source, unsubscribed_at)
+    values ($1, $2, null)
+    on conflict ((lower(email))) do update
+      set unsubscribed_at = null,
+          source = excluded.source,
+          updated_at = now()
+    returning id, email
+  `, [normalized, source]);
+  return found[0];
+}

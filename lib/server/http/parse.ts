@@ -61,6 +61,7 @@ export const schemas = {
   }),
   credentials: z.object({ email: z.string().trim().email(), password: z.string().min(6), fullName: z.string().trim().min(3).optional() }),
   resend: z.object({ email: z.string().trim().email() }),
+  newsletter: z.object({ email: z.string().trim().email().max(254) }),
   resetPassword: z.object({ password: z.string().min(6).max(72) }),
   status: z.object({ status: z.enum(["confirmed", "processing", "shipped", "delivered", "cancelled", "returned", "refunded"]), reason: z.string().max(400).optional() }),
   adjust: z.object({ variantId: z.string().uuid(), type: z.enum(["purchase", "restock", "adjustment", "return", "damage", "manual_correction"]), delta: z.number().int().refine((value) => value !== 0), note: z.string().max(400).optional() }),
